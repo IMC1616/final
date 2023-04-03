@@ -1,5 +1,5 @@
-const { matchedData } = require("express-validator");
 const User = require("../models/User");
+const { matchedData } = require("express-validator");
 const { handleHttpError } = require("../utils/handleError");
 const generatePassword = require("../utils/generatePassword");
 const { encrypt } = require("../utils/handlePassword");
@@ -89,22 +89,44 @@ const createUser = async (req, res) => {
       data: user,
     });
   } catch (error) {
-    console.log("[ERROR_CREATE_USER]:", error);
     handleHttpError(res, "ERROR_CREATE_USER");
   }
 };
 
 const updateUser = async (req, res) => {
   try {
+    const { id } = req.params;
+    const updateFields = matchedData(req);
+
+    const user = await User.findByIdAndUpdate(id, updateFields, { new: true });
+
+    res.status(200).json({
+      success: true,
+      data: user,
+    });
   } catch (error) {
-    handleHttpError(res, "ERROR_REFRESH_ACCESS_TOKEN");
+    handleHttpError(res, "ERROR_UPDATE_USER");
   }
 };
 
 const deleteUser = async (req, res) => {
   try {
+    const { id } = req.params;
+
+    const user = await User.findById(id);
+    if (!user) {
+      return handleHttpError(res, "USER_NOT_EXISTS", 404);
+    }
+
+    await user.delete();
+
+    res.status(200).json({
+      success: true,
+      data: user,
+    });
   } catch (error) {
-    handleHttpError(res, "ERROR_REFRESH_ACCESS_TOKEN");
+    handleHttpError(res, "ERROR_DELETE_USER");
   }
 };
+
 module.exports = { getUsers, createUser, updateUser, deleteUser };

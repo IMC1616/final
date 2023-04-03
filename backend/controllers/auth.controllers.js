@@ -7,7 +7,7 @@ const { handleHttpError } = require("../utils/handleError");
 const login = async (req, res) => {
   try {
     const { email, password } = matchedData(req);
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select("+password");
 
     if (!user) {
       handleHttpError(res, "USER_NOT_EXISTS", 404);
@@ -40,11 +40,8 @@ const refreshAccessToken = async (req, res) => {
   try {
     const { _id } = req.user;
 
-    // Get user by id
     const user = await User.findById(_id);
-    user.set("password", undefined, { strict: false });
 
-    // Generate a new JWT
     const token = await signToken(user);
 
     res.status(200).json({
@@ -58,5 +55,9 @@ const refreshAccessToken = async (req, res) => {
     handleHttpError(res, "ERROR_REFRESH_ACCESS_TOKEN");
   }
 };
+
+// TODO: const logout = async (req, res) => {}
+// TODO: const sendResetPasswordLink = async (req, res) => {}
+// TODO: const resetPassword = async (req, res) => {}
 
 module.exports = { login, refreshAccessToken };

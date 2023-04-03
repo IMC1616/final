@@ -23,7 +23,7 @@ router.post(
   userController.createUser
 );
 
-router.post(
+router.put(
   "/:id",
   [updateUserValidator, isAuthenticated, isAuthorized(["admin"])],
   userController.updateUser

@@ -45,5 +45,10 @@ const UserScheme = new mongoose.Schema(
   }
 );
 
+UserScheme.method("toJSON", function () {
+  const { password, ...object } = this.toObject();
+  return object;
+});
+
 UserScheme.plugin(mongooseDelete, { overrideMethods: "all" });
 module.exports = mongoose.model("Users", UserScheme);
