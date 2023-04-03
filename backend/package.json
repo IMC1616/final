@@ -1,0 +1,54 @@
+{
+  "name": "backend",
+  "version": "0.0.1",
+  "description": "",
+  "main": "app.js",
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "scripts": {
+    "start": "node ./index.js",
+    "start:dev": "nodemon ./index.js",
+    "start:prod": "pm2 delete all && pm2 start ./index.js --name=app",
+    "test": "cross-env NODE_ENV=test jest --silent --runInBand --no-color 2>test-output.log",
+    "test:watch": "cross-env NODE_ENV=test jest --coverage --watch --silent --runInBand",
+    "create-admin-user": "node ./database/scripts/createAdminUser.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "express-validator": "^6.15.0",
+    "helmet": "^6.0.1",
+    "jsonwebtoken": "^9.0.0",
+    "mongoose": "^6.10.4",
+    "mongoose-delete": "^0.5.4",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.1",
+    "swagger-ui-express": "^4.6.2"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "supertest": "^6.3.3"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ],
+    "coverageReporters": [
+      "json",
+      "html"
+    ],
+    "globalTeardown": "./global-kill.js"
+  },
+  "engines": {
+    "node": "16.x"
+  }
+}
