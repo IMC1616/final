@@ -3,13 +3,25 @@ const mongooseDelete = require('mongoose-delete')
 
 const MeterScheme = new mongoose.Schema(
   {
-    name: {
+    code: {
       type: String,
+      unique: true,
       required: true,
     },
-    pricePerkWh: {
-      type: Number,
+    status: {
+      type: String,
+      enum: ["active", "inactive"],
+      default: "active",
+    },
+    property: {
+      type: Schema.Types.ObjectId,
       required: true,
+      ref: 'Properties',
+    },
+    category: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: 'Categories',
     },
   },
   {
