@@ -12,7 +12,7 @@ const PropertyScheme = new mongoose.Schema(
       required: true,
     },
     user: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: 'Users',
     },
