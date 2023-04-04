@@ -7,7 +7,7 @@ const CategoryScheme = new mongoose.Schema(
       type: String,
       required: true,
     },
-    pricePerkWh: {
+    pricePerCubicMeter: {
       type: Number,
       required: true,
     },
