@@ -1,4 +1,6 @@
 const User = require("../models/User");
+const Property = require("../models/Property");
+const Meter = require("../models/Meter");
 const { matchedData } = require("express-validator");
 const { handleHttpError } = require("../utils/handleError");
 const generatePassword = require("../utils/generatePassword");
@@ -55,6 +57,44 @@ const getUsers = async (req, res) => {
     });
   } catch (error) {
     handleHttpError(res, "ERROR_GET_USERS");
+  }
+};
+
+const getUserProperties = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const properties = await Property.find({ user: userId });
+
+    res.status(200).json({
+      success: true,
+      data: properties,
+    });
+  } catch (error) {
+    handleHttpError(res, "ERROR_GET_USER_PROPERTIES");
+  }
+};
+
+const getUserMeters = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const meters = await Meter.find().populate([
+      {
+        path: "property",
+        match: { user: userId },
+      },
+      {
+        path: "category",
+      },
+    ]);
+
+    const userMeters = meters.filter((meter) => meter.property !== null);
+
+    res.status(200).json({
+      success: true,
+      data: userMeters,
+    });
+  } catch (error) {
+    handleHttpError(res, "ERROR_GET_USER_METERS");
   }
 };
 
@@ -129,4 +169,11 @@ const deleteUser = async (req, res) => {
   }
 };
 
-module.exports = { getUsers, createUser, updateUser, deleteUser };
+module.exports = {
+  getUsers,
+  getUserProperties,
+  getUserMeters,
+  createUser,
+  updateUser,
+  deleteUser,
+};

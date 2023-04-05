@@ -17,6 +17,14 @@ router.get(
   userController.getUsers
 );
 
+router.get(
+  "/:userId/properties",
+  [isAuthenticated],
+  userController.getUserProperties
+);
+
+router.get("/:userId/meters", [isAuthenticated], userController.getUserMeters);
+
 router.post(
   "/",
   [createUserValidator, isAuthenticated, isAuthorized(["admin"])],
