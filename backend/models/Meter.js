@@ -14,12 +14,12 @@ const MeterScheme = new mongoose.Schema(
       default: "active",
     },
     property: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: 'Properties',
     },
     category: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: 'Categories',
     },
