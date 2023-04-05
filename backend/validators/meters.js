@@ -1,5 +1,25 @@
-const { check, param } = require("express-validator");
+const { check, param, query } = require("express-validator");
 const validateResults = require("../utils/handleValidator");
+
+const getMetersValidator = [
+  query("offset")
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage(
+      "The 'offset' value must be an integer equal to or greater than 0."
+    ),
+  query("limit")
+    .optional()
+    .isInt({ min: 1 })
+    .withMessage("The 'limit' value must be an integer greater than 0."),
+  query("sort")
+    .optional()
+    .isIn(["asc", "desc"])
+    .withMessage("The 'sort' value must be 'asc' or 'desc'."),
+  (req, res, next) => {
+    return validateResults(req, res, next);
+  },
+];
 
 const createMeterValidator = [
   check("code")
@@ -60,6 +80,7 @@ const deleteMeterValidator = [
 ];
 
 module.exports = {
+  getMetersValidator,
   createMeterValidator,
   updateMeterValidator,
   deleteMeterValidator,

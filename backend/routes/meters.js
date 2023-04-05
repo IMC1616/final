@@ -1,6 +1,7 @@
 const express = require("express");
 const meterController = require("../controllers/meters");
 const {
+  getMetersValidator,
   createMeterValidator,
   updateMeterValidator,
   deleteMeterValidator,
@@ -10,12 +11,16 @@ const isAuthorized = require("../middlewares/isAuthorized");
 
 const router = express.Router();
 
-// TODO: search by code, or search in general
-
 router.get(
   "/",
-  [isAuthenticated, isAuthorized(["reader", "admin"])],
+  [getMetersValidator, isAuthenticated, isAuthorized(["reader", "admin"])],
   meterController.getMeters
+);
+
+router.get(
+  "/code/:code",
+  [getMetersValidator, isAuthenticated],
+  meterController.getMeterByCode
 );
 
 router.post(

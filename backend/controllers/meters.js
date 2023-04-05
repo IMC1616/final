@@ -1,16 +1,92 @@
 const Meter = require("../models/Meter");
+const Consumption = require("../models/Consumption");
 const { matchedData } = require("express-validator");
 const { handleHttpError } = require("../utils/handleError");
 
+const buildMeterQuery = (query) => {
+  const queryFields = ["code", "status", "property", "category"];
+  const queryObj = {};
+
+  queryFields.forEach((field) => {
+    if (query[field]) {
+      queryObj[field] = { $regex: query[field], $options: "i" };
+    }
+  });
+
+  return queryObj;
+};
+
 const getMeters = async (req, res) => {
   try {
-    const meters = await Meter.find().populate(["category", "property"]);
+    const offset = parseInt(req.query.offset) || 0;
+    const limit = parseInt(req.query.limit) || 10;
+    const sort = req.query.sort || "asc";
+    const select = req.query.select || "";
+    const query = buildMeterQuery(req.query);
+
+    const queryBuilder = Meter.find(query)
+      .skip(offset)
+      .limit(limit)
+      .sort(sort)
+      .populate(["category", "property"]);
+
+    if (select) {
+      const fields = select.split(",").join(" ");
+      queryBuilder.select(fields);
+    }
+
+    const meters = await queryBuilder.exec();
     res.status(200).json({
       success: true,
       data: meters,
     });
   } catch (error) {
     handleHttpError(res, "ERROR_GET_METERS");
+  }
+};
+
+const getMeterByCode = async (req, res) => {
+  try {
+    const { code } = req.params;
+
+    if (!code) {
+      return res.status(400).json({
+        success: false,
+        message: "The 'code' parameter is required to perform the search.",
+      });
+    }
+
+    const meter = await Meter.findOne({ code }).populate([
+      {
+        path: "category",
+        select: "name pricePerCubicMeter",
+      },
+      {
+        path: "property",
+        select: "address",
+      },
+    ]);
+
+    if (!meter) {
+      return res.status(404).json({
+        success: false,
+        message: "No meter with that code was found.",
+      });
+    }
+
+    const consumptions = await Consumption.find({ meter: meter._id }).select(
+      "readingDate currentReading consumptionCubicMeters"
+    );
+
+    res.status(200).json({
+      success: true,
+      data: {
+        meter,
+        consumptions,
+      },
+    });
+  } catch (error) {
+    handleHttpError(res, "ERROR_GET_METER_BY_CODE");
   }
 };
 
@@ -87,6 +163,7 @@ const deleteMeter = async (req, res) => {
 
 module.exports = {
   getMeters,
+  getMeterByCode,
   createMeter,
   updateMeter,
   deleteMeter,
