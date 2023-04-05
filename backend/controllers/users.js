@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const Property = require("../models/Property");
 const Meter = require("../models/Meter");
+const Consumption = require("../models/Consumption");
 const { matchedData } = require("express-validator");
 const { handleHttpError } = require("../utils/handleError");
 const generatePassword = require("../utils/generatePassword");
@@ -98,6 +99,45 @@ const getUserMeters = async (req, res) => {
   }
 };
 
+const getUserConsumptions = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { startDate, endDate } = req.query;
+
+    const properties = await Property.find({ user: userId });
+
+    const propertyIds = properties.map((property) => property._id);
+
+    const meters = await Meter.find({ property: { $in: propertyIds } });
+    const meterIds = meters.map((meter) => meter._id);
+
+    const query = { meter: { $in: meterIds } };
+
+    if (startDate && endDate) {
+      query.readingDate = {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate),
+      };
+    }
+
+    const consumptions = await Consumption.find(query).populate({
+      path: "meter",
+      select: "status code property",
+      // populate: {
+      //   path: "property",
+      // },
+    });
+
+    res.status(200).json({
+      success: true,
+      data: consumptions,
+    });
+  } catch (error) {
+    handleHttpError(res, "ERROR_GET_USER_CONSUMPTIONS");
+  }
+};
+
+
 const createUser = async (req, res) => {
   try {
     const { name, lastName, email, mobile, phone, role } = matchedData(req);
@@ -173,6 +213,7 @@ module.exports = {
   getUsers,
   getUserProperties,
   getUserMeters,
+  getUserConsumptions,
   createUser,
   updateUser,
   deleteUser,

@@ -15,12 +15,12 @@ const ConsumptionScheme = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    consumptionkWh: {
+    consumptionCubicMeters: {
       type: Number,
       required: true,
     },
     meter: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: 'Meters',
     },

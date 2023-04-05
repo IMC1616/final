@@ -10,6 +10,8 @@ const isAuthorized = require("../middlewares/isAuthorized");
 
 const router = express.Router();
 
+// TODO: search by code, or search in general
+
 router.get(
   "/",
   [isAuthenticated, isAuthorized(["reader", "admin"])],

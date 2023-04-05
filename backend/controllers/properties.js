@@ -8,11 +8,7 @@ const buildQuery = (query) => {
 
   queryFields.forEach((field) => {
     if (query[field]) {
-      if (field === "role") {
-        queryObj[field] = query[field];
-      } else {
-        queryObj[field] = { $regex: query[field], $options: "i" };
-      }
+      queryObj[field] = { $regex: query[field], $options: "i" };
     }
   });
 

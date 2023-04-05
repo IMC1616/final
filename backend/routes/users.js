@@ -25,6 +25,8 @@ router.get(
 
 router.get("/:userId/meters", [isAuthenticated], userController.getUserMeters);
 
+router.get("/:userId/consumptions", [isAuthenticated], userController.getUserConsumptions);
+
 router.post(
   "/",
   [createUserValidator, isAuthenticated, isAuthorized(["admin"])],
