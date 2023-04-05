@@ -59,7 +59,7 @@ const getMeterByCode = async (req, res) => {
     const meter = await Meter.findOne({ code }).populate([
       {
         path: "category",
-        select: "name pricePerCubicMeter",
+        select: "name pricePerCubicMeter fixedPrice",
       },
       {
         path: "property",

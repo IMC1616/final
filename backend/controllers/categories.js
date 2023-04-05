@@ -16,9 +16,9 @@ const getCategories = async (req, res) => {
 
 const createCategory = async (req, res) => {
   try {
-    const { name, pricePerCubicMeter } = matchedData(req);
+    const { name, pricePerCubicMeter, fixedPrice } = matchedData(req);
 
-    const categoryExists = await Category.findOne({ name, pricePerCubicMeter });
+    const categoryExists = await Category.findOne({ name });
 
     if (categoryExists) {
       return handleHttpError(res, "CATEGORY_ALREADY_EXISTS", 400);
@@ -27,6 +27,7 @@ const createCategory = async (req, res) => {
     const newCategory = new Category({
       name,
       pricePerCubicMeter,
+      fixedPrice,
     });
 
     const category = await newCategory.save();
@@ -39,6 +40,7 @@ const createCategory = async (req, res) => {
     handleHttpError(res, "ERROR_CREATE_CATEGORY");
   }
 };
+
 const updateCategory = async (req, res) => {
   try {
     const { id } = req.params;

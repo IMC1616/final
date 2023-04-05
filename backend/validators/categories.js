@@ -10,12 +10,29 @@ const createCategoryValidator = [
     .isLength({ min: 3, max: 99 })
     .withMessage("The 'name' field must be between 3 and 99 characters."),
   check("pricePerCubicMeter")
-    .exists()
-    .withMessage("The 'pricePerCubicMeter' field is required.")
+    .optional()
     .notEmpty()
     .withMessage("The 'pricePerCubicMeter' field cannot be empty.")
     .isNumeric()
     .withMessage("The 'pricePerCubicMeter' field must be a number."),
+  check("fixedPrice")
+    .optional()
+    .notEmpty()
+    .withMessage("The 'fixedPrice' field cannot be empty.")
+    .isNumeric()
+    .withMessage("The 'fixedPrice' field must be a number."),
+  check("pricePerCubicMeter").custom((value, { req }) => {
+    if (value && req.body.fixedPrice) {
+      throw new Error(
+        "You must set only one of the fields 'pricePerCubicMeter' or 'fixedPrice'"
+      );
+    } else if (!value && !req.body.fixedPrice) {
+      throw new Error(
+        "You must set one of the fields 'pricePerCubicMeter' or 'fixedPrice'"
+      );
+    }
+    return true;
+  }),
   (req, res, next) => {
     return validateResults(req, res, next);
   },
@@ -34,6 +51,24 @@ const updateCategoryValidator = [
     .withMessage("The 'pricePerCubicMeter' field cannot be empty.")
     .isNumeric()
     .withMessage("The 'pricePerCubicMeter' field must be a number."),
+  check("fixedPrice")
+    .optional()
+    .notEmpty()
+    .withMessage("The 'fixedPrice' field cannot be empty.")
+    .isNumeric()
+    .withMessage("The 'fixedPrice' field must be a number."),
+  check("pricePerCubicMeter").custom((value, { req }) => {
+    if (value && req.body.fixedPrice) {
+      throw new Error(
+        "You must set only one of the fields 'pricePerCubicMeter' or 'fixedPrice'"
+      );
+    } else if (!value && !req.body.fixedPrice) {
+      throw new Error(
+        "You must set one of the fields 'pricePerCubicMeter' or 'fixedPrice'"
+      );
+    }
+    return true;
+  }),
   (req, res, next) => {
     return validateResults(req, res, next);
   },
