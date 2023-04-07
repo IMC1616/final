@@ -13,7 +13,11 @@ const buildQuery = (query) => {
 
   queryFields.forEach((field) => {
     if (query[field]) {
-      if (field === "previousReading" || field === "currentReading" || field === "consumptionCubicMeters") {
+      if (
+        field === "previousReading" ||
+        field === "currentReading" ||
+        field === "consumptionCubicMeters"
+      ) {
         queryObj[field] = parseFloat(query[field]);
       } else {
         queryObj[field] = { $regex: query[field], $options: "i" };
@@ -31,12 +35,13 @@ const buildQuery = (query) => {
   return queryObj;
 };
 
-
 const getConsumptions = async (req, res) => {
   try {
     const offset = parseInt(req.query.offset) || 0;
     const limit = parseInt(req.query.limit) || 10;
-    const sort = req.query.sort ? { [req.query.sort]: req.query.order || "asc" } : { readingDate: "asc" };
+    const sort = req.query.sort
+      ? { [req.query.sort]: req.query.order || "asc" }
+      : { readingDate: "asc" };
     const select = req.query.select || "";
     const query = buildQuery(req.query);
 
@@ -67,7 +72,6 @@ const getConsumptions = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log("🚀 ~ file: consumptions.js:59 ~ getConsumptions ~ error:", error)
     handleHttpError(res, "ERROR_GET_CONSUMPTIONS");
   }
 };
@@ -82,12 +86,23 @@ const createConsumption = async (req, res) => {
       meter,
     } = matchedData(req);
 
+    const startDate = new Date(
+      readingDate.getFullYear(),
+      readingDate.getMonth(),
+      1
+    );
+    const endDate = new Date(
+      readingDate.getFullYear(),
+      readingDate.getMonth() + 1,
+      0
+    );
+
     const consumptionExists = await Consumption.findOne({
-      readingDate,
-      previousReading,
-      currentReading,
-      consumptionCubicMeters,
       meter,
+      readingDate: {
+        $gte: startDate,
+        $lte: endDate,
+      },
     });
 
     if (consumptionExists) {
