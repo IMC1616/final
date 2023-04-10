@@ -87,7 +87,11 @@ const AccountPopover = () => {
         </Box>
         <Divider />
         <Box sx={{ mt: 2 }}>
-          <MenuItem component={RouterLink} to="/dashboard/profile">
+          <MenuItem
+            component={RouterLink}
+            to="/dashboard/profile"
+            onClick={() => handleClose()}
+          >
             <ListItemIcon>
               <UserIcon fontSize="small" />
             </ListItemIcon>
@@ -99,7 +103,11 @@ const AccountPopover = () => {
               }
             />
           </MenuItem>
-          <MenuItem component={RouterLink} to="/dashboard/account">
+          <MenuItem
+            component={RouterLink}
+            to="/dashboard/account"
+            onClick={() => handleClose()}
+          >
             <ListItemIcon>
               <CogIcon fontSize="small" />
             </ListItemIcon>

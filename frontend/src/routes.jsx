@@ -13,18 +13,18 @@ const Loadable = (Component) => (props) =>
   );
 
 const Login = Loadable(lazy(() => import("./pages/auth/Login")));
-const User = Loadable(lazy(() => import("./pages/dashboard/users/Users")));
-const Categories = Loadable(
-  lazy(() => import("./pages/dashboard/categories/Categories"))
-);
+const Overview = Loadable(lazy(() => import("./pages/dashboard/overview/Overview")));
+const Account = Loadable(lazy(() => import("./pages/dashboard/account/Account")));
+const Invoices = Loadable(lazy(() => import("./pages/dashboard/invoices/Invoices")));
 const Meters = Loadable(lazy(() => import("./pages/dashboard/meters/Meters")));
+const Customers = Loadable(lazy(() => import("./pages/dashboard/customers/Customers")));
+const Categories = Loadable(lazy(() => import("./pages/dashboard/categories/Categories")));
+const Users = Loadable(lazy(() => import("./pages/dashboard/users/Users")));
 
 // Error pages
-const AuthorizationRequired = Loadable(
-  lazy(() => import("./pages/AuthorizationRequired"))
-);
-const NotFound = Loadable(lazy(() => import("./pages/NotFound")));
+const AuthorizationRequired = Loadable(lazy(() => import("./pages/AuthorizationRequired")));
 const ServerError = Loadable(lazy(() => import("./pages/ServerError")));
+const NotFound = Loadable(lazy(() => import("./pages/NotFound")));
 
 const routes = [
   {
@@ -35,9 +35,13 @@ const routes = [
       </RoleBaseGuard>
     ),
     children: [
+      { index: "/", element: <Overview /> },
+      { path: "account", element: <Account /> },
+      { path: "customers", element: <Customers /> },
+      { path: "invoices", element: <Invoices /> },
       { path: "categories", element: <Categories /> },
       { path: "meters", element: <Meters /> },
-      { path: "user", element: <User /> },
+      { path: "users", element: <Users /> },
     ],
   },
   {

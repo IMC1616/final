@@ -3,10 +3,7 @@ import { apiSlice } from "../apiSlice";
 const usersEndpoint = apiSlice.injectEndpoints({
   endpoints: (build) => ({
     getUsers: build.query({
-      query: () => ({
-        url: "/users",
-        method: "GET",
-      }),
+      query: (url) => url,
     }),
     createUser: build.mutation({
       query: (user) => ({

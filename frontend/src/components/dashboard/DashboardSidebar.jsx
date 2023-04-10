@@ -3,13 +3,13 @@ import { Link as RouterLink, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
 import { Avatar, Box, Divider, Drawer, Typography } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import ReceiptIcon from "@mui/icons-material/Receipt";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import ChartSquareBarIcon from "../../icons/ChartSquareBar";
 import UserIcon from "../../icons/User";
 import UsersIcon from "../../icons/Users";
 import ManageAccountIcon from "../../icons/ManageAccount";
-import AdjustmentsIcon from "../../icons/Adjustments";
-import DocumentTextIcon from "../../icons/DocumentText";
+import MeterIcon from "../../icons/Meter";
+import CategoryIcon from "../../icons/Category";
 import Logo from "../Logo";
 import NavSection from "../NavSection";
 import Scrollbar from "../Scrollbar";
@@ -21,7 +21,7 @@ const sections = [
     title: "General",
     items: [
       {
-        title: "Vista General",
+        title: "Visión general",
         path: "/dashboard",
         icon: <ChartSquareBarIcon fontSize="small" />,
       },
@@ -44,19 +44,19 @@ const sections = [
       {
         title: "Facturas",
         path: "/dashboard/invoices",
-        icon: <ReceiptIcon fontSize="small" />,
+        icon: <ReceiptLongIcon fontSize="small" />,
         roles: ["admin"],
       },
       {
         title: "Medidores",
         path: "/dashboard/meters",
-        icon: <AdjustmentsIcon fontSize="small" />,
+        icon: <MeterIcon fontSize="small" />,
         roles: ["admin"],
       },
       {
         title: "Categorias",
         path: "/dashboard/categories",
-        icon: <DocumentTextIcon fontSize="small" />,
+        icon: <CategoryIcon fontSize="small" />,
         roles: ["admin"],
       },
       {
