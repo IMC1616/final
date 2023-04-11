@@ -1,6 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { useRoutes } from "react-router-dom";
+import { Toaster } from 'react-hot-toast';
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { selectSettings } from "./features/settings/settingsSlice";
 import { createCustomTheme } from "./theme";
@@ -21,6 +22,7 @@ const App = () => {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
+      <Toaster position="top-center" />
       <SettingsDrawer />
       {content}
     </ThemeProvider>

@@ -1,13 +1,16 @@
 import React, { useCallback, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Helmet } from "react-helmet-async";
 import { Box, Button, Container, Grid, Typography } from "@mui/material";
 import PlusIcon from "../../../icons/Plus";
 import { selectSettings } from "../../../features/settings/settingsSlice";
 import UserListTable from "../../../components/dashboard/users/UserListTable";
+import { openModal } from "../../../features/users/userModalSlice";
 
 const Users = () => {
+  const dispatch = useDispatch();
   const settings = useSelector(selectSettings);
+
   return (
     <>
       <Helmet>Lista de usuarios</Helmet>
@@ -36,7 +39,7 @@ const Users = () => {
                   color="primary"
                   startIcon={<PlusIcon />}
                   sx={{ m: 1, fontSize: { lg: 14, md: 13, sm: 12, xs: 11 } }}
-                  onClick={() => dispatch(userActions.showCreateUserModal())}
+                  onClick={() => dispatch(openModal({ type: "create" }))}
                   variant="contained"
                 >
                   Agregar
