@@ -1,5 +1,5 @@
 import React from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import toast from "react-hot-toast";
@@ -23,7 +23,6 @@ import { selectModalData } from "../../../features/users/userModalSlice";
 import { roles } from "../../../constants";
 
 const UserModal = ({ isOpen, handleClose }) => {
-  const dispatch = useDispatch();
   const data = useSelector(selectModalData);
 
   const [createUser] = useCreateUserMutation();
@@ -172,9 +171,7 @@ const UserModal = ({ isOpen, handleClose }) => {
                       variant="outlined"
                       defaultCountry={"bo"}
                       value={values.phone}
-                      onChange={(newValue) =>
-                        setFieldValue("phone", newValue)
-                      }
+                      onChange={(newValue) => setFieldValue("phone", newValue)}
                     />
                   </Grid>
                   <Grid item lg={5} md={5} sm={5} xs={12}>
@@ -203,9 +200,9 @@ const UserModal = ({ isOpen, handleClose }) => {
               <Box sx={{ display: "flex", mx: 3, mt: 1 }}>
                 <Box sx={{ mt: 2 }}>
                   <Button
-                    color="primary"
-                    variant="text"
+                    color="error"
                     size="large"
+                    variant="contained"
                     onClick={handleClose}
                   >
                     Cancelar
@@ -215,10 +212,10 @@ const UserModal = ({ isOpen, handleClose }) => {
                 <Box sx={{ mt: 2 }}>
                   <Button
                     color="primary"
+                    size="large"
+                    variant="contained"
                     disabled={isSubmitting}
                     type="submit"
-                    variant="contained"
-                    size="large"
                   >
                     {data ? "Guardar Cambios" : "Crear Usuario"}
                   </Button>

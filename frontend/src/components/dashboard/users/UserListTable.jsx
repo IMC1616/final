@@ -6,9 +6,11 @@ import MaterialReactTable from "material-react-table";
 import { MRT_Localization_ES } from "material-react-table/locales/es";
 import { useGetUsersQuery } from "../../../services/endpoints/users";
 import UserModal from "./UserModal";
+import DeleteConfirmationModal from "./DeleteConfirmationModal";
 import {
   closeModal,
   openModal,
+  selectModalType,
   selectShowModal,
 } from "../../../features/users/userModalSlice";
 
@@ -21,6 +23,7 @@ const UserListTable = () => {
   const [rowCount, setRowCount] = useState(0);
 
   const showModal = useSelector(selectShowModal);
+  const modalType = useSelector(selectModalType);
 
   const queryString = useMemo(() => {
     const sort =
@@ -100,6 +103,13 @@ const UserListTable = () => {
     [dispatch]
   );
 
+  const handleDeleteRow = useCallback(
+    (row) => {
+      dispatch(openModal({ type: "delete", data: row.original }));
+    },
+    [dispatch]
+  );
+
   const handleCloseModal = useCallback(() => {
     dispatch(closeModal());
   }, [dispatch]);
@@ -164,7 +174,14 @@ const UserListTable = () => {
           </Box>
         )}
       />
-      <UserModal isOpen={showModal} handleClose={handleCloseModal} />
+      <UserModal
+        isOpen={showModal && modalType !== "delete"}
+        handleClose={handleCloseModal}
+      />
+      <DeleteConfirmationModal
+        open={showModal && modalType === "delete"}
+        handleClose={handleCloseModal}
+      />
     </>
   );
 };
