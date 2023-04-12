@@ -12,17 +12,17 @@ import {
 import { Alert } from "@mui/material";
 import { Delete } from "@mui/icons-material";
 import { selectModalData } from "../../../features/modal/modalSlice";
-import { useDeleteUserMutation } from "../../../services/endpoints/users";
+import { useDeleteCategoryMutation } from "../../../services/endpoints/categories";
 
 const DeleteConfirmationModal = ({ open, handleClose }) => {
   const data = useSelector(selectModalData);
-  const [deleteUser] = useDeleteUserMutation();
+  const [deleteCategory] = useDeleteCategoryMutation();
 
   const handleConfirm = async () => {
     try {
-      await deleteUser(data?._id);
+      await deleteCategory(data?._id);
 
-      toast.success("¡Usuario eliminado!");
+      toast.success("Categoría eliminado!");
       handleClose();
     } catch (error) {
       toast.error("¡Algo salió mal!");
@@ -40,7 +40,7 @@ const DeleteConfirmationModal = ({ open, handleClose }) => {
     >
       <DialogTitle id="dialog-title" align="center">
         <Alert severity="warning" icon={<Delete fontSize="inherit" />}>
-          ¿Estás seguro de eliminar a {data?.name} {data?.lastName}?
+          ¿Estás seguro de eliminar la categoría {data?.name}?
         </Alert>
       </DialogTitle>
       <DialogContent dividers align="center">

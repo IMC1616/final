@@ -5,7 +5,7 @@ import { Box, Button, Container, Grid, Typography } from "@mui/material";
 import PlusIcon from "../../../icons/Plus";
 import { selectSettings } from "../../../features/settings/settingsSlice";
 import UserListTable from "../../../components/dashboard/users/UserListTable";
-import { openModal } from "../../../features/users/userModalSlice";
+import { openModal } from "../../../features/modal/modalSlice";
 
 const Users = () => {
   const dispatch = useDispatch();
@@ -39,7 +39,9 @@ const Users = () => {
                   color="primary"
                   startIcon={<PlusIcon />}
                   sx={{ m: 1, fontSize: { lg: 14, md: 13, sm: 12, xs: 11 } }}
-                  onClick={() => dispatch(openModal({ type: "create" }))}
+                  onClick={() =>
+                    dispatch(openModal({ component: "user", type: "create" }))
+                  }
                   variant="contained"
                 >
                   Agregar

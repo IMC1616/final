@@ -1,11 +1,11 @@
 import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Box, Chip, IconButton, Tooltip } from "@mui/material";
+import { Box, IconButton, Tooltip } from "@mui/material";
 import { Delete, Edit } from "@mui/icons-material";
 import MaterialReactTable from "material-react-table";
 import { MRT_Localization_ES } from "material-react-table/locales/es";
-import { useGetUsersQuery } from "../../../services/endpoints/users";
-import UserModal from "./UserModal";
+import { useGetCategoriesQuery } from "../../../services/endpoints/categories";
+import CategoryModal from "./CategoryModal";
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
 import {
   closeModal,
@@ -15,7 +15,7 @@ import {
   selectModalComponent,
 } from "../../../features/modal/modalSlice";
 
-const UserListTable = () => {
+const CategoryListTable = () => {
   const dispatch = useDispatch();
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
   const [sorting, setSorting] = useState([]);
@@ -32,12 +32,12 @@ const UserListTable = () => {
       sorting.map((s) => `${s.desc ? "-" : ""}${s.id}`).join(",") || "asc";
     const offset = pagination.pageIndex * pagination.pageSize;
     const limit = pagination.pageSize;
-    const select = "name,lastName,email,phone,role";
+    const select = "name,pricePerCubicMeter,fixedPrice";
     const filters = columnFilters
       .map((filter) => `${filter.id}=${filter.value}`)
       .join("&");
 
-    const url = `/users?offset=${offset}&limit=${limit}&sort=${sort}&select=${select}&${filters}`;
+    const url = `/categories?offset=${offset}&limit=${limit}&sort=${sort}&select=${select}&${filters}`;
 
     return url;
   }, [pagination, sorting, columnFilters]);
@@ -48,11 +48,11 @@ const UserListTable = () => {
     isSuccess,
     data: fetchedData,
     isError,
-  } = useGetUsersQuery(queryString);
+  } = useGetCategoriesQuery(queryString);
 
   useEffect(() => {
     if (isSuccess) {
-      setData(fetchedData.data.users);
+      setData(fetchedData.data.categories);
       setRowCount(fetchedData.data.totalRecords);
     }
   }, [isSuccess, fetchedData]);
@@ -68,31 +68,12 @@ const UserListTable = () => {
         header: "Nombre",
       },
       {
-        accessorKey: "lastName",
-        header: "Apellidos",
+        accessorKey: "pricePerCubicMeter",
+        header: "P/m³",
       },
       {
-        accessorKey: "email",
-        header: "Correo",
-        Cell: ({ renderedCellValue }) => (
-          <Chip
-            size="small"
-            label={renderedCellValue}
-            color="info"
-            variant="outlined"
-            onClick={() => window.open(`mailto:${renderedCellValue}`)}
-          />
-        ),
-      },
-      {
-        accessorKey: "phone",
-        header: "Celular",
-      },
-      {
-        accessorKey: "role",
-        header: "Role",
-        filterVariant: "multi-select",
-        filterSelectOptions: ["admin", "user"],
+        accessorKey: "fixedPrice",
+        header: "P. fijo",
       },
     ],
     []
@@ -101,7 +82,7 @@ const UserListTable = () => {
   const handleEditRow = useCallback(
     (row) => {
       dispatch(
-        openModal({ component: "user", type: "edit", data: row.original })
+        openModal({ component: "category", type: "edit", data: row.original })
       );
     },
     [dispatch]
@@ -110,7 +91,7 @@ const UserListTable = () => {
   const handleDeleteRow = useCallback(
     (row) => {
       dispatch(
-        openModal({ component: "user", type: "delete", data: row.original })
+        openModal({ component: "category", type: "delete", data: row.original })
       );
     },
     [dispatch]
@@ -180,18 +161,20 @@ const UserListTable = () => {
           </Box>
         )}
       />
-      <UserModal
+      <CategoryModal
         isOpen={
-          showModal && modalComponent === "user" && modalType !== "delete"
+          showModal && modalComponent === "category" && modalType !== "delete"
         }
         handleClose={handleCloseModal}
       />
       <DeleteConfirmationModal
-        open={showModal && modalComponent === "user" && modalType === "delete"}
+        open={
+          showModal && modalComponent === "category" && modalType === "delete"
+        }
         handleClose={handleCloseModal}
       />
     </>
   );
 };
 
-export default UserListTable;
+export default CategoryListTable;

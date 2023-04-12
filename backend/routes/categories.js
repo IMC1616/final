@@ -1,6 +1,7 @@
 const express = require("express");
 const categoryController = require("../controllers/categories");
 const {
+  getCategoriesValidator,
   createCategoryValidator,
   updateCategoryValidator,
   deleteCategoryValidator,
@@ -12,7 +13,7 @@ const router = express.Router();
 
 router.get(
   "/",
-  [isAuthenticated, isAuthorized(["reader", "admin"])],
+  [getCategoriesValidator, isAuthenticated, isAuthorized(["reader", "admin"])],
   categoryController.getCategories
 );
 

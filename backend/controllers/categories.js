@@ -2,12 +2,50 @@ const Category = require("../models/Category");
 const { matchedData } = require("express-validator");
 const { handleHttpError } = require("../utils/handleError");
 
+const buildQuery = (query) => {
+  const queryFields = ["name", "pricePerCubicMeter", "fixedPrice"];
+  const queryObj = {};
+
+  queryFields.forEach((field) => {
+    if (query[field]) {
+      queryObj[field] = { $regex: query[field], $options: "i" };
+    }
+  });
+
+  return queryObj;
+};
 const getCategories = async (req, res) => {
   try {
-    const categories = await Category.find();
+    const offset = parseInt(req.query.offset) || 0;
+    const limit = parseInt(req.query.limit) || 10;
+    const sort = req.query.sort || "asc";
+    const select = req.query.select || "";
+    const query = buildQuery(req.query);
+
+    const queryBuilder = Category.find(query).skip(offset).limit(limit).sort(sort);
+
+    if (select) {
+      const fields = select.split(",").join(" ");
+      queryBuilder.select(fields);
+    }
+
+    const categories = await queryBuilder.exec();
+
+    const totalRecords = await Category.countDocuments(query);
+    const totalPages = Math.ceil(totalRecords / limit);
+
     res.status(200).json({
       success: true,
-      data: categories,
+      data: {
+        categories,
+        offset,
+        limit,
+        sort,
+        select,
+        query,
+        totalPages,
+        totalRecords,
+      },
     });
   } catch (error) {
     handleHttpError(res, "ERROR_GET_CATEGORIES");

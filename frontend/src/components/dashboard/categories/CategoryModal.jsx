@@ -11,35 +11,43 @@ import {
   Box,
   Grid,
   TextField,
-  MenuItem,
   Divider,
 } from "@mui/material";
-import MuiPhoneNumber from "material-ui-phone-number-2";
 import {
-  useCreateUserMutation,
-  useUpdateUserMutation,
-} from "../../../services/endpoints/users";
+  useCreateCategoryMutation,
+  useUpdateCategoryMutation,
+} from "../../../services/endpoints/categories";
 import { selectModalData } from "../../../features/modal/modalSlice";
-import { roles } from "../../../constants";
 
-const UserModal = ({ isOpen, handleClose }) => {
+const removeEmptyProperties = (obj) => {
+  return Object.entries(obj).reduce((newObj, [key, value]) => {
+    if (value !== null && value !== undefined && value !== "") {
+      newObj[key] = value;
+    }
+    return newObj;
+  }, {});
+};
+
+const CategoryModal = ({ isOpen, handleClose }) => {
   const data = useSelector(selectModalData);
 
-  const [createUser] = useCreateUserMutation();
-  const [updateUser] = useUpdateUserMutation();
+  const [createCategory] = useCreateCategoryMutation();
+  const [updateCategory] = useUpdateCategoryMutation();
 
   const handleSubmit = async (
     values,
     { setErrors, setStatus, setSubmitting }
   ) => {
     try {
+      const cleanedValues = removeEmptyProperties(values);
+
       let resultAction;
       if (data?._id) {
-        resultAction = await updateUser(values).unwrap();
-        toast.success("¡Usuario actualizado!");
+        resultAction = await updateCategory(cleanedValues).unwrap();
+        toast.success("Categoría actualizada!");
       } else {
-        resultAction = await createUser(values).unwrap();
-        toast.success("¡Usuario creado!");
+        resultAction = await createCategory(cleanedValues).unwrap();
+        toast.success("Categoría creada!");
       }
 
       setStatus({ success: true });
@@ -74,32 +82,40 @@ const UserModal = ({ isOpen, handleClose }) => {
         initialValues={{
           _id: data?._id,
           name: data?.name,
-          lastName: data?.lastName,
-          email: data?.email,
-          phone: data?.phone,
-          role: data?.role || "admin",
+          pricePerCubicMeter: data?.pricePerCubicMeter,
+          fixedPrice: data?.fixedPrice,
           submit: null,
         }}
         validationSchema={Yup.object().shape({
           name: Yup.string()
             .required("Debe ingresar el nombre")
             .matches(
-              /^(?=.{3,30}$)[a-zA-Z ]*$/,
-              "Mínimo 3 caracteres, máximo 30. Solo letras."
+              /^.{3,30}$/,
+              "Mínimo 3 caracteres, máximo 30."
             ),
-          lastName: Yup.string()
-            .max(255)
-            .required("Debe ingresar los apellidos")
-            .matches(
-              /^(?=.{3,100}$)[a-zA-Z ]*$/,
-              "Mínimo 3 caracteres, máximo 100. Solo letras."
+          pricePerCubicMeter: Yup.number()
+            .min(0, "El valor debe ser mayor o igual a 0")
+            .test(
+              "solo-un-precio",
+              "Debe ingresar un valor para Precio por metro cúbico o Precio fijo, pero no ambos.",
+              function (value) {
+                const { fixedPrice } = this.parent;
+                return (!!value && !fixedPrice) || (!value && !!fixedPrice);
+              }
             ),
-          email: Yup.string()
-            .max(255)
-            .email("Debe ser un correo electrónico válido")
-            .required("Correo electrónico es requerido"),
-          phone: Yup.string().max(50),
-          role: Yup.string().required("Debe asignar un rol"),
+          fixedPrice: Yup.number()
+            .min(0, "El valor debe ser mayor o igual a 0")
+            .test(
+              "solo-un-precio",
+              "Debe ingresar un valor para Precio por metro cúbico o Precio fijo, pero no ambos.",
+              function (value) {
+                const { pricePerCubicMeter } = this.parent;
+                return (
+                  (!!value && !pricePerCubicMeter) ||
+                  (!value && !!pricePerCubicMeter)
+                );
+              }
+            ),
         })}
         onSubmit={handleSubmit}
       >
@@ -116,7 +132,7 @@ const UserModal = ({ isOpen, handleClose }) => {
           <form onSubmit={handleSubmit}>
             <Box sx={{ p: 3 }}>
               <DialogTitle id="form-dialog-title">
-                {data ? "Editar Usuario" : "Crear Usuario"}
+                {data ? "Editar Categoría" : "Crear Categoría"}
               </DialogTitle>
               <Divider />
               <DialogContent>
@@ -127,7 +143,7 @@ const UserModal = ({ isOpen, handleClose }) => {
                       error={Boolean(touched.name && errors.name)}
                       fullWidth
                       helperText={touched.name && errors.name}
-                      label="Nombre"
+                      label="Categoría"
                       name="name"
                       onBlur={handleBlur}
                       onChange={handleChange}
@@ -136,63 +152,39 @@ const UserModal = ({ isOpen, handleClose }) => {
                       variant="outlined"
                     />
                   </Grid>
-                  <Grid item lg={12} md={12} sm={12} xs={12}>
+                  <Grid item lg={6} md={6} sm={6} xs={12}>
                     <TextField
-                      error={Boolean(touched.lastName && errors.lastName)}
+                      error={Boolean(
+                        touched.pricePerCubicMeter && errors.pricePerCubicMeter
+                      )}
                       fullWidth
-                      helperText={touched.lastName && errors.lastName}
-                      label="Apellidos"
-                      name="lastName"
+                      helperText={
+                        touched.pricePerCubicMeter && errors.pricePerCubicMeter
+                      }
+                      label="Precio por metro cúbico"
+                      name="pricePerCubicMeter"
                       onBlur={handleBlur}
                       onChange={handleChange}
-                      required
-                      value={values.lastName}
+                      value={values.pricePerCubicMeter}
                       variant="outlined"
+                      type="number"
+                      disabled={!!values.fixedPrice}
                     />
                   </Grid>
-                  <Grid item lg={12} md={12} sm={12} xs={12}>
+                  <Grid item lg={6} md={6} sm={6} xs={12}>
                     <TextField
-                      error={Boolean(touched.email && errors.email)}
+                      error={Boolean(touched.fixedPrice && errors.fixedPrice)}
                       fullWidth
-                      helperText={touched.email && errors.email}
-                      label="Correo electrónico"
-                      name="email"
+                      helperText={touched.fixedPrice && errors.fixedPrice}
+                      label="Precio fijo"
+                      name="fixedPrice"
                       onBlur={handleBlur}
                       onChange={handleChange}
-                      required
-                      value={values.email}
+                      value={values.fixedPrice}
                       variant="outlined"
+                      type="number"
+                      disabled={!!values.pricePerCubicMeter}
                     />
-                  </Grid>
-                  <Grid item lg={7} md={7} sm={7} xs={12}>
-                    <MuiPhoneNumber
-                      label="Teléfono"
-                      fullWidth
-                      variant="outlined"
-                      defaultCountry={"bo"}
-                      value={values.phone}
-                      onChange={(newValue) => setFieldValue("phone", newValue)}
-                    />
-                  </Grid>
-                  <Grid item lg={5} md={5} sm={5} xs={12}>
-                    <TextField
-                      error={Boolean(touched.role && errors.role)}
-                      fullWidth
-                      helperText={touched.role && errors.role}
-                      label="Rol"
-                      name="role"
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      value={values.role}
-                      variant="outlined"
-                      select
-                    >
-                      {roles.map((opcion) => (
-                        <MenuItem key={opcion.value} value={opcion.value}>
-                          {opcion.label}
-                        </MenuItem>
-                      ))}
-                    </TextField>
                   </Grid>
                 </Grid>
               </DialogContent>
@@ -217,7 +209,7 @@ const UserModal = ({ isOpen, handleClose }) => {
                     disabled={isSubmitting}
                     type="submit"
                   >
-                    {data ? "Guardar Cambios" : "Crear Usuario"}
+                    {data ? "Guardar Cambios" : "Crear Categoría"}
                   </Button>
                 </Box>
               </Box>
@@ -229,4 +221,4 @@ const UserModal = ({ isOpen, handleClose }) => {
   );
 };
 
-export default UserModal;
+export default CategoryModal;
