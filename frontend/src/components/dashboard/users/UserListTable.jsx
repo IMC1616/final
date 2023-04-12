@@ -14,7 +14,7 @@ import {
 
 const UserListTable = () => {
   const dispatch = useDispatch();
-  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 5 });
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
   const [data, setData] = useState([]);
@@ -48,7 +48,7 @@ const UserListTable = () => {
   useEffect(() => {
     if (isSuccess) {
       setData(fetchedData.data.users);
-      setRowCount(fetchedData.data.totalPages);
+      setRowCount(fetchedData.data.totalRecords);
     }
   }, [isSuccess, fetchedData]);
 

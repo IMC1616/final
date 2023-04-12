@@ -41,8 +41,8 @@ const getUsers = async (req, res) => {
     }
 
     const users = await queryBuilder.exec();
-    const totalUsers = await User.countDocuments(query);
-    const totalPages = Math.ceil(totalUsers / limit);
+    const totalRecords = await User.countDocuments(query);
+    const totalPages = Math.ceil(totalRecords / limit);
 
     res.status(200).json({
       success: true,
@@ -54,6 +54,7 @@ const getUsers = async (req, res) => {
         select,
         query,
         totalPages,
+        totalRecords, 
       },
     });
   } catch (error) {
