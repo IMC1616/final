@@ -219,7 +219,7 @@ const getCustomerConsumptions = async (req, res) => {
 
 const createCustomer = async (req, res) => {
   try {
-    const { name, lastName, email, mobile, phone } = matchedData(req);
+    const { name, lastName, ci, email, mobile, phone } = matchedData(req);
 
     const customerExists = await User.findOne({ email });
 
@@ -232,6 +232,7 @@ const createCustomer = async (req, res) => {
     const newUser = new User({
       name,
       lastName,
+      ci,
       email,
       mobile,
       phone,
@@ -248,6 +249,7 @@ const createCustomer = async (req, res) => {
       data: customer,
     });
   } catch (error) {
+    console.log("🚀 ~ file: customers.js:251 ~ createCustomer ~ error:", error)
     handleHttpError(res, "ERROR_CREATE_CUSTOMER");
   }
 };

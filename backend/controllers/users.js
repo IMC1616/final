@@ -141,7 +141,7 @@ const getUserConsumptions = async (req, res) => {
 
 const createUser = async (req, res) => {
   try {
-    const { name, lastName, email, mobile, phone, role } = matchedData(req);
+    const { name, lastName, ci, email, mobile, phone, role } = matchedData(req);
 
     const userExists = await User.findOne({ email });
 
@@ -154,6 +154,7 @@ const createUser = async (req, res) => {
     const newUser = new User({
       name,
       lastName,
+      ci,
       email,
       mobile,
       phone,

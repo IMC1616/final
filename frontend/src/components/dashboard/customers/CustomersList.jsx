@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect, useCallback } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Box,
   Button,
@@ -13,7 +13,15 @@ import {
   TextField,
 } from "@mui/material";
 import { useGetUsersQuery } from "../../../services/endpoints/users";
-import CustomerFilter from "./CustomerFilter"; // Importa el nuevo componente
+import CustomerFilter from "./CustomerFilter";
+import CustomerModal from "./CustomerModal";
+import {
+  closeModal,
+  openModal,
+  selectShowModal,
+  selectModalType,
+  selectModalComponent,
+} from "../../../features/modal/modalSlice";
 
 const CustomersList = () => {
   const dispatch = useDispatch();
@@ -26,13 +34,16 @@ const CustomersList = () => {
   const [searchCi, setSearchCi] = useState("");
   const [searchMeterCode, setSearchMeterCode] = useState("");
 
+  const showModal = useSelector(selectShowModal);
+  const modalType = useSelector(selectModalType);
+  const modalComponent = useSelector(selectModalComponent);
+
   const filteredCustomers = dataUsers.filter((customer) => {
     return (
       (searchCi === "" || customer.ci.includes(searchCi)) &&
       (searchMeterCode === "" || customer.meterCode.includes(searchMeterCode))
     );
   });
-
 
   const queryString = useMemo(() => {
     const sort =
@@ -63,6 +74,10 @@ const CustomersList = () => {
       setRowCount(fetchedDataUsers.data.totalRecords);
     }
   }, [isSuccessUsers, fetchedDataUsers]);
+
+  const handleCloseModal = useCallback(() => {
+    dispatch(closeModal());
+  }, [dispatch]);
 
   if (isLoadingUsers) {
     return (
@@ -102,6 +117,13 @@ const CustomersList = () => {
           </Grid>
         ))}
       </Grid>
+
+      <CustomerModal
+        isOpen={
+          showModal && modalComponent === "customer" && modalType !== "delete"
+        }
+        handleClose={handleCloseModal}
+      />
     </>
   );
 };
