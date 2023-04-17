@@ -10,7 +10,7 @@ const MeterScheme = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["active", "inactive"],
+      enum: ["active", "inactive", "damaged", "suspended"],
       default: "active",
     },
     property: {

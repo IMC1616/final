@@ -16,6 +16,11 @@ const UserScheme = new mongoose.Schema(
       unique: true,
       required: true,
     },
+    ci: {
+      type: String,
+      unique: true,
+      required: true,
+    },
     password: {
       type: String,
       required: true,
@@ -25,8 +30,8 @@ const UserScheme = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["user", "reader", "admin"],
-      default: "user",
+      enum: ["customer", "reader", "admin"],
+      default: "customer",
     },
     resetPasswordToken: {
       type: String,

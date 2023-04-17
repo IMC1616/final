@@ -1,7 +1,7 @@
 const { check, param, query } = require("express-validator");
 const validateResults = require("../utils/handleValidator");
 
-const getUsersValidator = [
+const searchCustomersValidator = [
   query("offset")
     .optional()
     .isInt({ min: 0 })
@@ -21,7 +21,7 @@ const getUsersValidator = [
   },
 ];
 
-const createUserValidator = [
+const createCustomerValidator = [
   check("name").exists().notEmpty().isLength({ min: 3, max: 99 }),
   check("lastName").exists().notEmpty().isLength({ min: 3, max: 99 }),
   check("email").exists().notEmpty().isEmail(),
@@ -29,13 +29,12 @@ const createUserValidator = [
   check("password").optional().notEmpty().isLength({ min: 6, max: 100 }),
   check("mobile").optional().isString().isLength({ min: 10, max: 15 }),
   check("phone").optional().isString().isLength({ min: 10, max: 15 }),
-  check("role").exists().isIn(["user", "reader", "admin"]),
   (req, res, next) => {
     return validateResults(req, res, next);
   },
 ];
 
-const updateUserValidator = [
+const updateCustomerValidator = [
   param("id").isMongoId().withMessage("Invalid user ID."),
   check("name").optional().notEmpty().isLength({ min: 3, max: 99 }),
   check("lastName").optional().notEmpty().isLength({ min: 3, max: 99 }),
@@ -43,13 +42,12 @@ const updateUserValidator = [
   check("ci").exists().notEmpty(),
   check("mobile").optional().isString(),
   check("phone").optional().isString(),
-  check("role").optional().isIn(["user", "reader", "admin"]),
   (req, res, next) => {
     return validateResults(req, res, next);
   },
 ];
 
-const deleteUserValidator = [
+const deleteCustomerValidator = [
   param("id").isMongoId().withMessage("Invalid user ID."),
   (req, res, next) => {
     return validateResults(req, res, next);
@@ -57,8 +55,8 @@ const deleteUserValidator = [
 ];
 
 module.exports = {
-  getUsersValidator,
-  createUserValidator,
-  updateUserValidator,
-  deleteUserValidator,
+  searchCustomersValidator,
+  createCustomerValidator,
+  updateCustomerValidator,
+  deleteCustomerValidator,
 };
