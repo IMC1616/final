@@ -1,6 +1,6 @@
 export const THEMES = {
-  LIGHT: 'LIGHT',
-  DARK: 'DARK'
+  LIGHT: "LIGHT",
+  DARK: "DARK",
 };
 
 export const roles = [
@@ -13,3 +13,10 @@ export const roles = [
     value: "admin",
   },
 ];
+
+export const meterStatuses = {
+  active: "Activo",
+  inactive: "Inactivo",
+  damaged: "Dañado",
+  suspended: "Suspendido",
+};

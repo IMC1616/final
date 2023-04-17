@@ -15,7 +15,7 @@ const LoginJWT = (props) => {
     <Formik
       initialValues={{
         email: "dev.morales.jordy@gmail.com",
-        password: "NdeiPvD",
+        password: "NdeiPDv",
         submit: null,
       }}
       validationSchema={Yup.object().shape({
