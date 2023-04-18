@@ -141,9 +141,24 @@ const searchCustomers = async (req, res) => {
   }
 };
 
+const getCustomerById = async (req, res) => {
+  try {
+    const { customerId } = req.params;
+    const customer = await User.findById(customerId);
+
+    res.status(200).json({
+      success: true,
+      data: customer,
+    });
+  } catch (error) {
+    handleHttpError(res, "ERROR_GET_CUSTOMER");
+  }
+};
+
 const getCustomerProperties = async (req, res) => {
   try {
     const { customerId } = req.params;
+    console.log("🚀 ~ file: customers.js:161 ~ getCustomerProperties ~ customerId:", customerId)
     const properties = await Property.find({ user: customerId });
 
     res.status(200).json({
@@ -294,6 +309,7 @@ const deleteCustomer = async (req, res) => {
 
 module.exports = {
   searchCustomers,
+  getCustomerById,
   getCustomerProperties,
   getCustomerMeters,
   getCustomerConsumptions,

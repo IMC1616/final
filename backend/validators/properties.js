@@ -24,6 +24,8 @@ const getPropertiesValidator = [
 const createPropertyValidator = [
   check("address").exists().notEmpty().withMessage("Address is required."),
   check("city").exists().notEmpty().withMessage("City is required."),
+  check("latitude").exists().notEmpty().withMessage("Latitude is required."),
+  check("longitude").exists().notEmpty().withMessage("Longitude is required."),
   check("user")
     .exists()
     .notEmpty()
@@ -38,6 +40,8 @@ const updatePropertyValidator = [
   param("id").isMongoId().withMessage("Invalid property ID."),
   check("address").optional().notEmpty().withMessage("Address is required."),
   check("city").optional().notEmpty().withMessage("City is required."),
+  check("latitude").optional().exists().notEmpty().withMessage("Latitude is required."),
+  check("longitude").optional().exists().notEmpty().withMessage("Longitude is required."),
   check("user")
     .optional()
     .notEmpty()

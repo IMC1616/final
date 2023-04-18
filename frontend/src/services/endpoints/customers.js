@@ -12,6 +12,42 @@ const customersEndpoint = apiSlice.injectEndpoints({
         { type: "Customer", id: "LIST" },
       ],
     }),
+    getCustomerById: build.query({
+      query: (id) => `/customers/${id}`,
+      providesTags: (result) => [
+        { type: "Customer", id: result.data._id },
+      ],
+    }),
+    getCustomerProperties: build.query({
+      query: (id) => `/customers/${id}/properties`,
+      providesTags: (result) => [
+        ...result?.data?.map((property) => ({
+          type: "Property",
+          id: property._id,
+        })),
+        { type: "Property", id: "LIST" },
+      ],
+    }),
+    getCustomerMeters: build.query({
+      query: (id) => `/customers/${id}/meters`,
+      providesTags: (result) => [
+        ...result?.data?.meters.map((meter) => ({
+          type: "Meter",
+          id: meter._id,
+        })),
+        { type: "Meter", id: "LIST" },
+      ],
+    }),
+    getCustomerConsumptions: build.query({
+      query: (id) => `/customers/${id}/consumptions`,
+      providesTags: (result) => [
+        ...result?.data?.consumptions.map((consumption) => ({
+          type: "Consumption",
+          id: consumption._id,
+        })),
+        { type: "Consumption", id: "LIST" },
+      ],
+    }),
     createCustomer: build.mutation({
       query: (customer) => ({
         url: "/customers",
@@ -40,6 +76,10 @@ const customersEndpoint = apiSlice.injectEndpoints({
 
 export const {
   useGetCustomersQuery,
+  useGetCustomerByIdQuery,
+  useGetCustomerPropertiesQuery,
+  useGetCustomerMetersQuery,
+  useGetCustomerConsumptionsQuery,
   useCreateCustomerMutation,
   useUpdateCustomerMutation,
   useDeleteCustomerMutation,

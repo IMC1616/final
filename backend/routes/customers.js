@@ -22,6 +22,12 @@ router.get(
 );
 
 router.get(
+  "/:customerId",
+  [isAuthenticated],
+  customerController.getCustomerById
+);
+
+router.get(
   "/:customerId/properties",
   [isAuthenticated],
   customerController.getCustomerProperties

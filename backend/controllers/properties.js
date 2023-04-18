@@ -57,7 +57,7 @@ const getProperties = async (req, res) => {
 
 const createProperty = async (req, res) => {
   try {
-    const { address, city, user } = matchedData(req);
+    const { address, city, latitude, longitude, user } = matchedData(req);
 
     const propertyExists = await Property.findOne({ address, city, user });
 
@@ -68,6 +68,8 @@ const createProperty = async (req, res) => {
     const newProperty = new Property({
       address,
       city,
+      latitude,
+      longitude,
       user,
     });
 
