@@ -16,59 +16,6 @@ import Scrollbar from "../Scrollbar";
 import { useSelector } from "react-redux";
 import { selectCurrentUser } from "../../features/auth/authSlice";
 
-const sections = [
-  {
-    title: "General",
-    items: [
-      {
-        title: "Visión general",
-        path: "/dashboard",
-        icon: <ChartSquareBarIcon fontSize="small" />,
-      },
-      {
-        title: "Cuenta",
-        path: "/dashboard/account",
-        icon: <UserIcon fontSize="small" />,
-      },
-    ],
-  },
-  {
-    title: "Administración",
-    items: [
-      {
-        title: "Clientes",
-        path: "/dashboard/customers",
-        icon: <UsersIcon fontSize="small" />,
-        roles: ["admin"],
-      },
-      {
-        title: "Facturas",
-        path: "/dashboard/invoices",
-        icon: <ReceiptLongIcon fontSize="small" />,
-        roles: ["admin"],
-      },
-      {
-        title: "Medidores",
-        path: "/dashboard/meters",
-        icon: <MeterIcon fontSize="small" />,
-        roles: ["admin"],
-      },
-      {
-        title: "Categorias",
-        path: "/dashboard/categories",
-        icon: <CategoryIcon fontSize="small" />,
-        roles: ["admin"],
-      },
-      {
-        title: "Usuarios",
-        path: "/dashboard/users",
-        icon: <ManageAccountIcon fontSize="small" />,
-        roles: ["admin"],
-      },
-    ],
-  },
-];
-
 const DashboardSidebar = (props) => {
   const { onMobileClose, openMobile } = props;
   const location = useLocation();
@@ -80,6 +27,63 @@ const DashboardSidebar = (props) => {
       onMobileClose();
     }
   }, [location.pathname]);
+
+  const isPathActive = (path) => {
+    return location.pathname.startsWith(path);
+  };
+
+  const sections = [
+    {
+      title: "General",
+      items: [
+        {
+          title: "Visión general",
+          path: "/dashboard/overview",
+          icon: <ChartSquareBarIcon fontSize="small" />,
+        },
+        {
+          title: "Cuenta",
+          path: "/dashboard/account",
+          icon: <UserIcon fontSize="small" />,
+        },
+      ],
+    },
+    {
+      title: "Administración",
+      items: [
+        {
+          title: "Clientes",
+          path: "/dashboard/customers",
+          icon: <UsersIcon fontSize="small" />,
+          roles: ["admin"],
+        },
+        {
+          title: "Facturas",
+          path: "/dashboard/invoices",
+          icon: <ReceiptLongIcon fontSize="small" />,
+          roles: ["admin"],
+        },
+        {
+          title: "Medidores",
+          path: "/dashboard/meters",
+          icon: <MeterIcon fontSize="small" />,
+          roles: ["admin"],
+        },
+        {
+          title: "Categorias",
+          path: "/dashboard/categories",
+          icon: <CategoryIcon fontSize="small" />,
+          roles: ["admin"],
+        },
+        {
+          title: "Usuarios",
+          path: "/dashboard/users",
+          icon: <ManageAccountIcon fontSize="small" />,
+          roles: ["admin"],
+        },
+      ],
+    },
+  ];
 
   const content = (
     <Box
@@ -146,6 +150,7 @@ const DashboardSidebar = (props) => {
             <NavSection
               key={section.title}
               pathname={location.pathname}
+              isPathActive={isPathActive}
               sx={{
                 "& + &": {
                   mt: 3,
