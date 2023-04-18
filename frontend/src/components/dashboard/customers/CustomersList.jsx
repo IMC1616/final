@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Link as RouterLink } from "react-router-dom";
 import {
   Box,
   Button,
@@ -28,7 +29,7 @@ const CustomersList = () => {
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
   const [sorting, setSorting] = useState([]);
   const [columnFilters, setColumnFilters] = useState([]);
-  const [dataUsers, setDataUsers] = useState([]);
+  const [dataCustomers, setDataCustomers] = useState([]);
   const [rowCount, setRowCount] = useState(0);
 
   const [searchCi, setSearchCi] = useState("");
@@ -38,7 +39,7 @@ const CustomersList = () => {
   const modalType = useSelector(selectModalType);
   const modalComponent = useSelector(selectModalComponent);
 
-  const filteredCustomers = dataUsers.filter((customer) => {
+  const filteredCustomers = dataCustomers.filter((customer) => {
     return (
       (searchCi === "" || customer.ci.includes(searchCi)) &&
       (searchMeterCode === "" || customer.meterCode.includes(searchMeterCode))
@@ -70,7 +71,7 @@ const CustomersList = () => {
 
   useEffect(() => {
     if (isSuccessUsers) {
-      setDataUsers(fetchedDataUsers.data.users);
+      setDataCustomers(fetchedDataUsers.data.users);
       setRowCount(fetchedDataUsers.data.totalRecords);
     }
   }, [isSuccessUsers, fetchedDataUsers]);
@@ -96,16 +97,16 @@ const CustomersList = () => {
         setSearchMeterCode={setSearchMeterCode}
       />
       <Grid container spacing={{ xs: 2, md: 3 }}>
-        {dataUsers.map((user) => (
-          <Grid item key={user._id} xs={12} sm={6} md={6} lg={4} xl={4}>
+        {dataCustomers.map((customer) => (
+          <Grid item key={customer._id} xs={12} sm={6} md={6} lg={4} xl={4}>
             <Card>
-              <CardActionArea>
+              <CardActionArea component={RouterLink} to={`/dashboard/customers/${customer._id}`}>
                 <CardContent>
                   <Typography gutterBottom variant="h5" component="div">
-                    {user.name} {user.lastName}
+                    {customer.name} {customer.lastName}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    {user.email}
+                    {customer.email}
                   </Typography>
                 </CardContent>
               </CardActionArea>

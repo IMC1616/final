@@ -13,16 +13,31 @@ const Loadable = (Component) => (props) =>
   );
 
 const Login = Loadable(lazy(() => import("./pages/auth/Login")));
-const Overview = Loadable(lazy(() => import("./pages/dashboard/overview/Overview")));
-const Account = Loadable(lazy(() => import("./pages/dashboard/account/Account")));
-const Invoices = Loadable(lazy(() => import("./pages/dashboard/invoices/Invoices")));
+const Overview = Loadable(
+  lazy(() => import("./pages/dashboard/overview/Overview"))
+);
+const Account = Loadable(
+  lazy(() => import("./pages/dashboard/account/Account"))
+);
+const Invoices = Loadable(
+  lazy(() => import("./pages/dashboard/invoices/Invoices"))
+);
 const Meters = Loadable(lazy(() => import("./pages/dashboard/meters/Meters")));
-const Customers = Loadable(lazy(() => import("./pages/dashboard/customers/Customers")));
-const Categories = Loadable(lazy(() => import("./pages/dashboard/categories/Categories")));
+const Customers = Loadable(
+  lazy(() => import("./pages/dashboard/customers/Customers"))
+);
+const CustomerOverview = Loadable(
+  lazy(() => import("./pages/dashboard/customers/CustomerOverview"))
+);
+const Categories = Loadable(
+  lazy(() => import("./pages/dashboard/categories/Categories"))
+);
 const Users = Loadable(lazy(() => import("./pages/dashboard/users/Users")));
 
 // Error pages
-const AuthorizationRequired = Loadable(lazy(() => import("./pages/AuthorizationRequired")));
+const AuthorizationRequired = Loadable(
+  lazy(() => import("./pages/AuthorizationRequired"))
+);
 const ServerError = Loadable(lazy(() => import("./pages/ServerError")));
 const NotFound = Loadable(lazy(() => import("./pages/NotFound")));
 
@@ -37,7 +52,19 @@ const routes = [
     children: [
       { index: "/", element: <Overview /> },
       { path: "account", element: <Account /> },
-      { path: "customers", element: <Customers /> },
+      {
+        path: "customers",
+        children: [
+          {
+            index: true,
+            element: <Customers />, // TODO: Add guard to this route
+          },
+          {
+            path: ":customerId",
+            element: <CustomerOverview />, // TODO: Add guard to this route
+          },
+        ],
+      },
       { path: "invoices", element: <Invoices /> },
       { path: "categories", element: <Categories /> },
       { path: "meters", element: <Meters /> },
