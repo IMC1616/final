@@ -14,9 +14,7 @@ const customersEndpoint = apiSlice.injectEndpoints({
     }),
     getCustomerById: build.query({
       query: (id) => `/customers/${id}`,
-      providesTags: (result) => [
-        { type: "Customer", id: result.data._id },
-      ],
+      providesTags: (result) => [{ type: "Customer", id: result.data._id }],
     }),
     getCustomerProperties: build.query({
       query: (id) => `/customers/${id}/properties`,
@@ -27,6 +25,35 @@ const customersEndpoint = apiSlice.injectEndpoints({
         })),
         { type: "Property", id: "LIST" },
       ],
+    }),
+    createCustomerProperty: build.mutation({
+      query: (property) => ({
+        url: "/properties",
+        method: "POST",
+        body: property,
+      }),
+      invalidatesTags: (result) => [
+        { type: "Property", id: "LIST" },
+        { type: "Property", id: result.data._id },
+      ],
+    }),
+    updateCustomerProperty: build.mutation({
+      query: (property) => ({
+        url: `/properties/${property._id}`,
+        method: "PUT",
+        body: property,
+      }),
+      invalidatesTags: (result) => [
+        { type: "Property", id: "LIST" },
+        { type: "Property", id: result.data._id },
+      ],
+    }),
+    deleteCustomerProperty: build.mutation({
+      query: (id) => ({
+        url: `/properties/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: (result, error, id) => [{ type: "Property", id }],
     }),
     getCustomerMeters: build.query({
       query: (id) => `/customers/${id}/meters`,
@@ -78,6 +105,9 @@ export const {
   useGetCustomersQuery,
   useGetCustomerByIdQuery,
   useGetCustomerPropertiesQuery,
+  useCreateCustomerPropertyMutation,
+  useUpdateCustomerPropertyMutation,
+  useDeleteCustomerPropertyMutation,
   useGetCustomerMetersQuery,
   useGetCustomerConsumptionsQuery,
   useCreateCustomerMutation,

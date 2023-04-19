@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router";
 import {
   Box,
@@ -13,8 +13,11 @@ import {
 import { selectSettings } from "../../../features/settings/settingsSlice";
 import { useGetCustomerByIdQuery } from "../../../services/endpoints/customers";
 import CustomerProperties from "../../../components/dashboard/customers/CustomerProperties";
+import { openModal } from "../../../features/modal/modalSlice";
 
 const CustomerOverview = () => {
+  const dispatch = useDispatch();
+
   const params = useParams();
   const settings = useSelector(selectSettings);
 
@@ -68,7 +71,18 @@ const CustomerOverview = () => {
                   alignItems="center"
                 >
                   <Typography variant="h6">Propiedades</Typography>
-                  <Button variant="contained" color="primary">
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => {
+                      dispatch(
+                        openModal({
+                          component: "property",
+                          type: "create",
+                        })
+                      );
+                    }}
+                  >
                     Agregar
                   </Button>
                 </Box>
