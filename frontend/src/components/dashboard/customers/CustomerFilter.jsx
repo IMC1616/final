@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { TextField, Box, MenuItem } from "@mui/material";
 import { useGetCategoriesQuery } from "../../../services/endpoints/categories";
 import { meterStatuses } from "../../../constants";

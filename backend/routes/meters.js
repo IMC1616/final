@@ -23,6 +23,12 @@ router.get(
   meterController.getMeterByCode
 );
 
+router.get(
+  "/:id/consumptions",
+  [isAuthenticated, isAuthorized(["reader", "admin"])],
+  meterController.getMeterConsumptions
+)
+
 router.post(
   "/",
   [createMeterValidator, isAuthenticated, isAuthorized(["admin"])],

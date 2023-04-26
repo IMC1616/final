@@ -122,7 +122,6 @@ const searchCustomers = async (req, res) => {
     ]);
 
     const totalPages = Math.ceil(totalRecords[0]?.totalRecords / parseInt(limit)) || 0;
-    console.log("🚀 ~ file: customers.js:132 ~ searchCustomers ~ totalPages:", totalPages)
 
     res.status(200).json({
       success: true,
@@ -136,7 +135,6 @@ const searchCustomers = async (req, res) => {
       },
     });
   } catch (error) {
-    console.log("🚀 ~ file: customers.js:88 ~ searchCustomers ~ error:", error);
     handleHttpError(res, "ERROR_GET_CUSTOMERS");
   }
 };
@@ -158,7 +156,6 @@ const getCustomerById = async (req, res) => {
 const getCustomerProperties = async (req, res) => {
   try {
     const { customerId } = req.params;
-    console.log("🚀 ~ file: customers.js:161 ~ getCustomerProperties ~ customerId:", customerId)
     const properties = await Property.find({ user: customerId });
 
     res.status(200).json({
@@ -264,7 +261,6 @@ const createCustomer = async (req, res) => {
       data: customer,
     });
   } catch (error) {
-    console.log("🚀 ~ file: customers.js:251 ~ createCustomer ~ error:", error)
     handleHttpError(res, "ERROR_CREATE_CUSTOMER");
   }
 };

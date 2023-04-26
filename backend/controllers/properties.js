@@ -1,3 +1,4 @@
+const Meter = require("../models/Meter");
 const Property = require("../models/Property");
 const { matchedData } = require("express-validator");
 const { handleHttpError } = require("../utils/handleError");
@@ -52,6 +53,24 @@ const getProperties = async (req, res) => {
     });
   } catch (error) {
     handleHttpError(res, "ERROR_GET_PROPERTIES");
+  }
+};
+
+const getPropertyMeters = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const property = await Property.findById(id);
+    if (!property) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No se encontró la propiedad." });
+    }
+
+    const meters = await Meter.find({ property: id }).populate('category');
+    return res.status(200).json({ success: true, data: meters });
+  } catch (err) {
+    handleHttpError(res, "ERROR_GET_PROPERTY_METERS");
   }
 };
 
@@ -124,6 +143,7 @@ const deleteProperty = async (req, res) => {
 
 module.exports = {
   getProperties,
+  getPropertyMeters,
   createProperty,
   updateProperty,
   deleteProperty,

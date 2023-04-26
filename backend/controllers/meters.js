@@ -90,6 +90,24 @@ const getMeterByCode = async (req, res) => {
   }
 };
 
+const getMeterConsumptions = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const meter = await Meter.findById(id);
+    if (!meter) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No se encontró la propiedad." });
+    }
+
+    const consumptions = await Consumption.find({ meter: id });
+    return res.status(200).json({ success: true, data: consumptions });
+  } catch (err) {
+    handleHttpError(res, "ERROR_GET_PROPERTY_METERS");
+  }
+};
+
 const createMeter = async (req, res) => {
   try {
     const { code, status, property, category } = matchedData(req);
@@ -164,6 +182,7 @@ const deleteMeter = async (req, res) => {
 module.exports = {
   getMeters,
   getMeterByCode,
+  getMeterConsumptions,
   createMeter,
   updateMeter,
   deleteMeter,

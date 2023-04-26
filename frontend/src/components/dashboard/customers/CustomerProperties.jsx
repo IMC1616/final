@@ -47,8 +47,12 @@ const CustomerProperties = ({ customerId }) => {
   useEffect(() => {
     if (customerPropertiesData) {
       setMapReady(true);
+      if (customerPropertiesData.data.length > 0) {
+        dispatch(selectProperty(customerPropertiesData.data[0]._id));
+      }
     }
-  }, [customerPropertiesData]);
+  }, [customerPropertiesData, dispatch]);
+  
 
   const handleCloseModal = useCallback(() => {
     dispatch(closeModal());
@@ -65,7 +69,7 @@ const CustomerProperties = ({ customerId }) => {
               backgroundColor: "background.default",
               borderRight: (theme) =>
                 selectedProperty === property._id
-                  ? `7px solid ${theme.palette.primary.main}`
+                  ? `10px solid ${theme.palette.error.main}`
                   : "none",
             }}
           >

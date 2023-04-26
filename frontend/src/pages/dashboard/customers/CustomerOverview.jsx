@@ -14,6 +14,12 @@ import { selectSettings } from "../../../features/settings/settingsSlice";
 import { useGetCustomerByIdQuery } from "../../../services/endpoints/customers";
 import CustomerProperties from "../../../components/dashboard/customers/CustomerProperties";
 import { openModal } from "../../../features/modal/modalSlice";
+import CustomerMeters from "../../../components/dashboard/customers/CustomerMeters";
+import CustomerConsumptions from "../../../components/dashboard/customers/CustomerConsumptions";
+import {
+  selectSelectedMeter,
+  selectSelectedProperty,
+} from "../../../features/customers/customerSlice";
 
 const CustomerOverview = () => {
   const dispatch = useDispatch();
@@ -22,6 +28,9 @@ const CustomerOverview = () => {
   const settings = useSelector(selectSettings);
 
   const [customer, setCustomer] = useState(null);
+
+  const selectedProperty = useSelector(selectSelectedProperty);
+  const selectedMeter = useSelector(selectSelectedMeter);
 
   const {
     isLoading,
@@ -93,16 +102,60 @@ const CustomerOverview = () => {
           <Grid item xs={12} sm={4}>
             <Card sx={{ backgroundColor: "background.paper" }}>
               <CardContent>
-                <Typography variant="h6">Medidores</Typography>
-                {/* Aquí puedes mostrar la lista de medidores */}
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Typography variant="h6">Medidores</Typography>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => {
+                      dispatch(
+                        openModal({
+                          component: "meter",
+                          type: "create",
+                        })
+                      );
+                    }}
+                  >
+                    Agregar
+                  </Button>
+                </Box>
+                {selectedProperty && (
+                  <CustomerMeters propertyId={selectedProperty} />
+                )}
               </CardContent>
             </Card>
           </Grid>
           <Grid item xs={12} sm={4}>
             <Card sx={{ backgroundColor: "background.paper" }}>
               <CardContent>
-                <Typography variant="h6">Consumos</Typography>
-                {/* Aquí puedes mostrar la lista de consumos */}
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Typography variant="h6">Consumos</Typography>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => {
+                      dispatch(
+                        openModal({
+                          component: "consumption",
+                          type: "create",
+                        })
+                      );
+                    }}
+                  >
+                    Agregar
+                  </Button>
+                </Box>
+                {selectedMeter && (
+                  <CustomerConsumptions meterId={selectedMeter} />
+                )}
               </CardContent>
             </Card>
           </Grid>

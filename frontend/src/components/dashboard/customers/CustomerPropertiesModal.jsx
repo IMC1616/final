@@ -12,7 +12,6 @@ import {
   Box,
   Grid,
   TextField,
-  MenuItem,
   Divider,
 } from "@mui/material";
 import { selectModalData } from "../../../features/modal/modalSlice";
@@ -68,7 +67,6 @@ const CustomerPropertiesModal = ({ isOpen, handleClose }) => {
         }
       );
     } else {
-      // El navegador no soporta la API Geolocation
       console.error("La API Geolocation no es soportada por el navegador");
     }
   };
@@ -124,12 +122,13 @@ const CustomerPropertiesModal = ({ isOpen, handleClose }) => {
           _id: data?._id,
           address: data?.address || "",
           city: data?.city || "",
-          latitude: data?.latitude || (currentPosition && currentPosition[0]) || "",
-          longitude: data?.longitude || (currentPosition && currentPosition[1]) || "",
+          latitude:
+            data?.latitude || (currentPosition && currentPosition[0]) || "",
+          longitude:
+            data?.longitude || (currentPosition && currentPosition[1]) || "",
           user: data?.user || params.customerId,
           submit: null,
         }}
-        
         validationSchema={Yup.object().shape({
           address: Yup.string()
             .max(255, "La dirección no puede tener más de 255 caracteres")

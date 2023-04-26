@@ -17,6 +17,12 @@ router.get(
   propertyController.getProperties
 );
 
+router.get(
+  "/:id/meters",
+  [isAuthenticated, isAuthorized(["reader", "admin"])],
+  propertyController.getPropertyMeters
+)
+
 router.post(
   "/",
   [createPropertyValidator, isAuthenticated, isAuthorized(["admin"])],

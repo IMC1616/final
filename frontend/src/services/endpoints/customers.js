@@ -98,6 +98,26 @@ const customersEndpoint = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (result, error, id) => [{ type: "Customer", id }],
     }),
+    getPropertyMeters: build.query({
+      query: (id) => `/properties/${id}/meters`,
+      providesTags: (result) => [
+        ...result?.data?.map((meter) => ({
+          type: "Meter",
+          id: meter._id,
+        })),
+        { type: "Meter", id: "LIST" },
+      ],
+    }),
+    getMeterConsumptions: build.query({
+      query: (id) => `/meters/${id}/consumptions`,
+      providesTags: (result) => [
+        ...result?.data?.map((consumption) => ({
+          type: "Consumption",
+          id: consumption._id,
+        })),
+        { type: "Consumption", id: "LIST" },
+      ],
+    }),
   }),
 });
 
@@ -113,4 +133,6 @@ export const {
   useCreateCustomerMutation,
   useUpdateCustomerMutation,
   useDeleteCustomerMutation,
+  useGetPropertyMetersQuery,
+  useGetMeterConsumptionsQuery,
 } = customersEndpoint;
