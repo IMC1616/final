@@ -29,8 +29,8 @@ const createMeterValidator = [
     .withMessage("The code must have between 3 and 99 characters."),
   check("status")
     .optional()
-    .isIn(["active", "inactive"])
-    .withMessage("The State must be 'Active' or 'Inactive'."),
+    .isIn(["active", "inactive", "damaged", "suspended"])
+    .withMessage("The status must be 'active', 'inactive', 'damaged', or 'suspended'"),
   check("property")
     .exists()
     .notEmpty()
@@ -55,8 +55,8 @@ const updateMeterValidator = [
     .withMessage("The code must have between 3 and 99 characters."),
   check("status")
     .optional()
-    .isIn(["active", "inactive"])
-    .withMessage("The State must be 'Active' or 'Inactive'."),
+    .isIn(["active", "inactive", "damaged", "suspended"])
+    .withMessage("The status must be 'active', 'inactive', 'damaged', or 'suspended'"),
   check("property")
     .optional()
     .notEmpty()

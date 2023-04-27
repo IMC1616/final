@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
+  closeModal,
+  openModal,
   selectModalComponent,
   selectModalType,
   selectShowModal,
@@ -14,11 +16,29 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import { Edit } from "@mui/icons-material";
 import { useGetPropertyMetersQuery } from "../../../services/endpoints/customers";
 import {
   selectMeter,
   selectSelectedMeter,
 } from "../../../features/customers/customerSlice";
+import CustomerMetersModal from "./CustomerMetersModal";
+import { meterStatuses } from "../../../constants";
+
+const getStatusBackgroundColor = (status) => {
+  switch (status) {
+    case "active":
+      return "success.main";
+    case "inactive":
+      return "warning.main";
+    case "damaged":
+      return "error.main";
+    case "suspended":
+      return "info.main";
+    default:
+      return "text.primary";
+  }
+};
 
 const CustomerMeters = ({ propertyId }) => {
   const dispatch = useDispatch();
@@ -43,8 +63,11 @@ const CustomerMeters = ({ propertyId }) => {
     } else {
       dispatch(selectMeter(null));
     }
-  }, [propertyMetersData]);
+  }, [propertyMetersData, dispatch]);
 
+  const handleCloseModal = useCallback(() => {
+    dispatch(closeModal());
+  }, [dispatch]);
 
   if (isLoading) return <div>Cargando...</div>;
 
@@ -61,43 +84,89 @@ const CustomerMeters = ({ propertyId }) => {
                   : "none",
             }}
           >
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Código del medidor: {meter.code}
-              </Typography>
-              <Typography
-                variant="subtitle1"
-                sx={{
-                  backgroundColor: meter.status === "active" ? "success.main" : "error.main",
-                  borderRadius: "4px",
-                  color: "common.white",
-                  display: "inline-block",
-                  fontWeight: "bold",
-                  padding: "4px 8px",
+            <div style={{ position: "relative" }}>
+              <CardActionArea
+                onClick={() => {
+                  dispatch(selectMeter(meter._id));
                 }}
               >
-                Estado: {meter.status}
-              </Typography>
-              <Typography variant="subtitle1" marginTop={1}>
-                Categoría: {meter.category.name}
-              </Typography>
-              {meter.category.pricePerCubicMeter && (
-                <Typography variant="subtitle1" marginTop={1}>
-                  Precio por m³: {meter.category.pricePerCubicMeter}
-                </Typography>
-              )}
-              {meter.category.fixedPrice && (
-                <Typography variant="subtitle1" marginTop={1}>
-                  Precio fijo: {meter.category.fixedPrice}
-                </Typography>
-              )}
-            </CardContent>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom>
+                    Código del medidor: {meter.code}
+                  </Typography>
+                  <Typography
+                    variant="subtitle1"
+                    sx={{
+                      backgroundColor: getStatusBackgroundColor(meter.status),
+                      borderRadius: "4px",
+                      color: "common.white",
+                      display: "inline-block",
+                      fontWeight: "bold",
+                      padding: "4px 8px",
+                    }}
+                  >
+                    Estado: {meterStatuses[meter.status]}
+                  </Typography>
+                  <Typography variant="subtitle1" marginTop={1}>
+                    Categoría: {meter.category.name}
+                  </Typography>
+                  {meter.category.pricePerCubicMeter && (
+                    <Typography variant="subtitle1" marginTop={1}>
+                      Precio por m³: {meter.category.pricePerCubicMeter}
+                    </Typography>
+                  )}
+                  {meter.category.fixedPrice && (
+                    <Typography variant="subtitle1" marginTop={1}>
+                      Precio fijo: {meter.category.fixedPrice}
+                    </Typography>
+                  )}
+                </CardContent>
+              </CardActionArea>
+              <div
+                style={{
+                  position: "absolute",
+                  top: "10px",
+                  right: "20px",
+                  zIndex: 1000,
+                }}
+              >
+                <Tooltip placement="left" title="Editar medidor">
+                  <IconButton
+                    edge="end"
+                    sx={{
+                      color: "white",
+                      backgroundColor: "primary.main",
+                      borderRadius: "4px",
+                      "&:hover": {
+                        backgroundColor: "primary.dark",
+                      },
+                    }}
+                    onClick={() => {
+                      dispatch(
+                        openModal({
+                          component: "meter",
+                          type: "edit",
+                          data: meter,
+                        })
+                      );
+                    }}
+                  >
+                    <Edit />
+                  </IconButton>
+                </Tooltip>
+              </div>
+            </div>
           </Card>
         </Grid>
       ))}
+      <CustomerMetersModal
+        isOpen={
+          showModal && modalComponent === "meter" && modalType !== "delete"
+        }
+        handleClose={handleCloseModal}
+      />
     </Grid>
   );
-  
 };
 
 export default CustomerMeters;
