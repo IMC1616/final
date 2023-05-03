@@ -141,6 +141,31 @@ const customersEndpoint = apiSlice.injectEndpoints({
         { type: "Consumption", id: "LIST" },
       ],
     }),
+    createMeterConsumption: build.mutation({
+      query: (consumption) => ({
+        url: "/consumptions",
+        method: "POST",
+        body: consumption,
+      }),
+      invalidatesTags: [{ type: "Consumption", id: "LIST" }],
+    }),
+    updateMeterConsumption: build.mutation({
+      query: (consumption) => ({
+        url: `/consumptions/${consumption._id}`,
+        method: "PUT",
+        body: consumption,
+      }),
+      invalidatesTags: (result) => [
+        { type: "Consumption", id: result.data._id },
+      ],
+    }),
+    deleteMeterConsumption: build.mutation({
+      query: (id) => ({
+        url: `/consumptions/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: (result, error, id) => [{ type: "Consumption", id }],
+    }),
   }),
 });
 
@@ -161,4 +186,7 @@ export const {
   useUpdatePropertyMeterMutation,
   useDeletePropertyMeterMutation,
   useGetMeterConsumptionsQuery,
+  useCreateMeterConsumptionMutation,
+  useUpdateMeterConsumptionMutation,
+  useDeleteMeterConsumptionMutation,
 } = customersEndpoint;

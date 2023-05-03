@@ -89,7 +89,7 @@ const CustomerMetersModal = ({ isOpen, handleClose }) => {
           code: data?.code || "",
           status: data?.status || "active",
           property: data?.property || selectedProperty,
-          category: data?.category._id || "",
+          category: data?.category?._id || "",
           submit: null,
         }}
         validationSchema={Yup.object().shape({

@@ -23,7 +23,10 @@ const getConsumptionsValidator = [
 
 const createConsumptionValidator = [
   check("readingDate")
-    .isDate()
+    .custom((value) => {
+      const dateObject = new Date(value);
+      return !isNaN(dateObject.getTime());
+    })
     .withMessage("Reading date must be a valid date"),
   check("previousReading")
     .isNumeric()
@@ -40,10 +43,16 @@ const createConsumptionValidator = [
   },
 ];
 
+
+
+
 const updateConsumptionValidator = [
   check("readingDate")
     .optional()
-    .isDate()
+    .custom((value) => {
+      const dateObject = new Date(value);
+      return !isNaN(dateObject.getTime());
+    })
     .withMessage("Reading date must be a valid date"),
   check("previousReading")
     .optional()

@@ -86,14 +86,16 @@ const createConsumption = async (req, res) => {
       meter,
     } = matchedData(req);
 
+    const parsedReadingDate = new Date(readingDate);
+
     const startDate = new Date(
-      readingDate.getFullYear(),
-      readingDate.getMonth(),
+      parsedReadingDate.getFullYear(),
+      parsedReadingDate.getMonth(),
       1
     );
     const endDate = new Date(
-      readingDate.getFullYear(),
-      readingDate.getMonth() + 1,
+      parsedReadingDate.getFullYear(),
+      parsedReadingDate.getMonth() + 1,
       0
     );
 
@@ -110,7 +112,7 @@ const createConsumption = async (req, res) => {
     }
 
     const newConsumption = new Consumption({
-      readingDate,
+      readingDate: parsedReadingDate,
       previousReading,
       currentReading,
       consumptionCubicMeters,
@@ -124,9 +126,11 @@ const createConsumption = async (req, res) => {
       data: consumption,
     });
   } catch (error) {
+    console.log("🚀 ~ file: consumptions.js:127 ~ createConsumption ~ error:", error)
     handleHttpError(res, "ERROR_CREATE_CONSUMPTION");
   }
 };
+
 
 const updateConsumption = async (req, res) => {
   try {

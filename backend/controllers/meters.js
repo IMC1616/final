@@ -101,7 +101,7 @@ const getMeterConsumptions = async (req, res) => {
         .json({ success: false, message: "No se encontró la propiedad." });
     }
 
-    const consumptions = await Consumption.find({ meter: id });
+    const consumptions = await Consumption.find({ meter: id }).sort({ readingDate: -1 });
     return res.status(200).json({ success: true, data: consumptions });
   } catch (err) {
     handleHttpError(res, "ERROR_GET_PROPERTY_METERS");
