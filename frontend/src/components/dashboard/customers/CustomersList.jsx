@@ -13,7 +13,6 @@ import {
   Typography,
   TextField,
 } from "@mui/material";
-import { useGetUsersQuery } from "../../../services/endpoints/users";
 import CustomerFilter from "./CustomerFilter";
 import CustomerModal from "./CustomerModal";
 import {
@@ -23,64 +22,67 @@ import {
   selectModalType,
   selectModalComponent,
 } from "../../../features/modal/modalSlice";
+import { useSearchCustomersQuery } from "../../../services/endpoints/customers";
+import DeleteConfirmationModal from "./DeleteConfirmationModal";
 
 const CustomersList = () => {
   const dispatch = useDispatch();
-  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
-  const [sorting, setSorting] = useState([]);
-  const [columnFilters, setColumnFilters] = useState([]);
   const [dataCustomers, setDataCustomers] = useState([]);
   const [rowCount, setRowCount] = useState(0);
 
   const [searchCi, setSearchCi] = useState("");
   const [searchMeterCode, setSearchMeterCode] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedMeterStatus, setSelectedMeterStatus] = useState("");
 
   const showModal = useSelector(selectShowModal);
   const modalType = useSelector(selectModalType);
   const modalComponent = useSelector(selectModalComponent);
 
-  const filteredCustomers = dataCustomers.filter((customer) => {
-    return (
-      (searchCi === "" || customer.ci.includes(searchCi)) &&
-      (searchMeterCode === "" || customer.meterCode.includes(searchMeterCode))
-    );
-  });
-
   const queryString = useMemo(() => {
-    const sort =
-      sorting.map((s) => `${s.desc ? "-" : ""}${s.id}`).join(",") || "asc";
-    const offset = pagination.pageIndex * pagination.pageSize;
-    const limit = pagination.pageSize;
-    const select = "name,lastName,email,phone,role";
-    const filters = columnFilters
-      .map((filter) => `${filter.id}=${filter.value}`)
-      .join("&");
+    const params = new URLSearchParams();
 
-    const url = `/users?offset=${offset}&limit=${limit}&sort=${sort}&select=${select}&${filters}`;
+    if (searchCi) {
+      params.append("ci", searchCi);
+    }
+
+    if (searchMeterCode) {
+      params.append("code", searchMeterCode);
+    }
+
+    if (selectedCategory) {
+      params.append("category", selectedCategory);
+    }
+
+    if (selectedMeterStatus) {
+      params.append("status", selectedMeterStatus);
+    }
+
+    const url = `/customers?${params.toString()}`;
 
     return url;
-  }, [pagination, sorting, columnFilters]);
+  }, [searchCi, searchMeterCode, selectedCategory, selectedMeterStatus]);
 
   const {
-    isLoading: isLoadingUsers,
-    isFetching: isFetchingUsers,
-    isSuccess: isSuccessUsers,
-    data: fetchedDataUsers,
-    isError: isErrorUsers,
-  } = useGetUsersQuery(queryString);
+    isLoading: isLoadingCustomers,
+    isFetching: isFetchingCustomers,
+    isSuccess: isSuccessCustomers,
+    data: fetchedDataCustomers,
+    isError: isErrorCustomers,
+  } = useSearchCustomersQuery(queryString);
 
   useEffect(() => {
-    if (isSuccessUsers) {
-      setDataCustomers(fetchedDataUsers.data.users);
-      setRowCount(fetchedDataUsers.data.totalRecords);
+    if (isSuccessCustomers) {
+      setDataCustomers(fetchedDataCustomers.data.customers);
+      setRowCount(fetchedDataCustomers.data.totalRecords);
     }
-  }, [isSuccessUsers, fetchedDataUsers]);
+  }, [isSuccessCustomers, fetchedDataCustomers]);
 
   const handleCloseModal = useCallback(() => {
     dispatch(closeModal());
   }, [dispatch]);
 
-  if (isLoadingUsers) {
+  if (isLoadingCustomers) {
     return (
       <Box sx={{ display: "flex" }}>
         <CircularProgress />
@@ -95,12 +97,19 @@ const CustomersList = () => {
         setSearchCi={setSearchCi}
         searchMeterCode={searchMeterCode}
         setSearchMeterCode={setSearchMeterCode}
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
+        selectedMeterStatus={selectedMeterStatus}
+        setSelectedMeterStatus={setSelectedMeterStatus}
       />
       <Grid container spacing={{ xs: 2, md: 3 }}>
         {dataCustomers.map((customer) => (
           <Grid item key={customer._id} xs={12} sm={6} md={6} lg={4} xl={4}>
             <Card>
-              <CardActionArea component={RouterLink} to={`/dashboard/customers/${customer._id}`}>
+              <CardActionArea
+                component={RouterLink}
+                to={`/dashboard/customers/${customer._id}`}
+              >
                 <CardContent>
                   <Typography gutterBottom variant="h5" component="div">
                     {customer.name} {customer.lastName}
@@ -111,8 +120,34 @@ const CustomersList = () => {
                 </CardContent>
               </CardActionArea>
               <CardActions>
-                <Button size="small">Editar</Button>
-                <Button size="small">Eliminar</Button>
+                <Button
+                  size="small"
+                  onClick={() => {
+                    dispatch(
+                      openModal({
+                        component: "customer",
+                        type: "edit",
+                        data: customer,
+                      })
+                    );
+                  }}
+                >
+                  Editar
+                </Button>
+                <Button
+                  size="small"
+                  onClick={() => {
+                    dispatch(
+                      openModal({
+                        component: "customer",
+                        type: "delete",
+                        data: customer,
+                      })
+                    );
+                  }}
+                >
+                  Eliminar
+                </Button>
               </CardActions>
             </Card>
           </Grid>
@@ -122,6 +157,13 @@ const CustomersList = () => {
       <CustomerModal
         isOpen={
           showModal && modalComponent === "customer" && modalType !== "delete"
+        }
+        handleClose={handleCloseModal}
+      />
+
+      <DeleteConfirmationModal
+        open={
+          showModal && modalComponent === "customer" && modalType === "delete"
         }
         handleClose={handleCloseModal}
       />

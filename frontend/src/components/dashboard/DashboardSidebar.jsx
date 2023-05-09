@@ -41,11 +41,11 @@ const DashboardSidebar = (props) => {
           path: "/dashboard/overview",
           icon: <ChartSquareBarIcon fontSize="small" />,
         },
-        {
-          title: "Cuenta",
-          path: "/dashboard/account",
-          icon: <UserIcon fontSize="small" />,
-        },
+        // {
+        //   title: "Cuenta",
+        //   path: "/dashboard/account",
+        //   icon: <UserIcon fontSize="small" />,
+        // },
       ],
     },
     {
@@ -57,18 +57,18 @@ const DashboardSidebar = (props) => {
           icon: <UsersIcon fontSize="small" />,
           roles: ["admin"],
         },
-        {
-          title: "Facturas",
-          path: "/dashboard/invoices",
-          icon: <ReceiptLongIcon fontSize="small" />,
-          roles: ["admin"],
-        },
-        {
-          title: "Medidores",
-          path: "/dashboard/meters",
-          icon: <MeterIcon fontSize="small" />,
-          roles: ["admin"],
-        },
+        // {
+        //   title: "Facturas",
+        //   path: "/dashboard/invoices",
+        //   icon: <ReceiptLongIcon fontSize="small" />,
+        //   roles: ["admin"],
+        // },
+        // {
+        //   title: "Medidores",
+        //   path: "/dashboard/meters",
+        //   icon: <MeterIcon fontSize="small" />,
+        //   roles: ["admin"],
+        // },
         {
           title: "Categorias",
           path: "/dashboard/categories",

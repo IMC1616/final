@@ -8,136 +8,76 @@ const generatePassword = require("../utils/generatePassword");
 const { encrypt } = require("../utils/handlePassword");
 const sendEmail = require("../utils/sendEmail");
 
-const buildQuery = async (query) => {
-  const queryFields = ["ci", "meterCode", "category", "meterStatus"];
-  const queryObj = { role: "customer" };
-  const meterIds = new Set();
+const searchCustomers = async (req, res) => {
+  const { ci, code, category, status } = req.query;
 
-  for (const field of queryFields) {
-    if (query[field]) {
-      switch (field) {
-        case "ci":
-          queryObj.ci = { $regex: query[field], $options: "i" };
-          break;
-        case "meterCode":
-          const meters = await Meter.find({
-            code: { $regex: query[field], $options: "i" },
-          }).select("_id");
-          meters.forEach((meter) => meterIds.add(meter._id));
-          break;
-        case "category":
-          const categoryMeters = await Meter.find({ category: query[field] }).select("_id");
-          categoryMeters.forEach((meter) => meterIds.add(meter._id));
-          break;
-        case "meterStatus":
-          const metersStatus = await Meter.find({ status: query[field] }).select("_id");
-          metersStatus.forEach((meter) => meterIds.add(meter._id));
-          break;
-        default:
-          break;
+  try {
+    if (!ci && !code && !category && !status) {
+      const customers = await User.find({ role: "customer" }).exec();
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          customers,
+        },
+      });
+    }
+
+    let meterConditions = {};
+
+    if (code) {
+      meterConditions.code = code;
+    }
+
+    if (category) {
+      meterConditions.category = category;
+    }
+
+    if (status) {
+      meterConditions.status = status;
+    }
+
+    let customers = [];
+
+    if (ci) {
+      customers = await User.find({ ci, role: "customer" });
+
+      if (customers.length === 0) {
+        return res.status(404).json({ message: "Usuario no encontrado" });
       }
     }
-  }
 
-  if (meterIds.size > 0) {
-    queryObj["meter"] = { $in: Array.from(meterIds) };
-  }
+    const meters = await Meter.find(meterConditions);
 
-  return queryObj;
-};
+    if (meters.length > 0) {
+      const propertyIds = meters.map((meter) => meter.property);
+      const properties = await Property.find({ _id: { $in: propertyIds } });
 
-const searchCustomers = async (req, res) => {
-  try {
-    const {
-      offset = 0,
-      limit = 10,
-      sort = "asc",
-    } = req.query;
+      const userIds = properties.map((property) => property.user);
+      const matchedUsers = await User.find({
+        _id: { $in: userIds },
+        role: "customer",
+      });
 
-    const match = await buildQuery(req.query);
-    const customers = await Property.aggregate([
-      {
-        $lookup: {
-          from: "users",
-          localField: "user",
-          foreignField: "_id",
-          as: "user",
-        },
-      },
-      { $unwind: "$user" },
-      {
-        $lookup: {
-          from: "meters",
-          localField: "_id",
-          foreignField: "property",
-          as: "meter",
-        },
-      },
-      { $unwind: "$meter" },
-      {
-        $lookup: {
-          from: "categories",
-          localField: "meter.category",
-          foreignField: "_id",
-          as: "meter.category",
-        },
-      },
-      { $unwind: "$meter.category" },
-      { $match: match },
-      { $skip: parseInt(offset) },
-      { $limit: parseInt(limit) },
-      { $sort: { "user.name": sort === "asc" ? 1 : -1 } },
-    ]);
+      customers = customers.concat(matchedUsers);
+    } else {
+      return res.status(404).json({ message: "Medidor no encontrado" });
+    }
 
-    const totalRecords = await Property.aggregate([
-      {
-        $lookup: {
-          from: "users",
-          localField: "user",
-          foreignField: "_id",
-          as: "user",
-        },
-      },
-      { $unwind: "$user" },
-      {
-        $lookup: {
-          from: "meters",
-          localField: "_id",
-          foreignField: "property",
-          as: "meter",
-        },
-      },
-      { $unwind: "$meter" },
-      {
-        $lookup: {
-          from: "categories",
-          localField: "meter.category",
-          foreignField: "_id",
-          as: "meter.category",
-        },
-      },
-      { $unwind: "$meter.category" },
-      { $match: match },
-      { $count: "totalRecords" },
-    ]);
+    const uniqueCustomersSet = new Set(customers.map((customer) => JSON.stringify(customer)));
+    const uniqueCustomers = Array.from(uniqueCustomersSet).map((customerString) => JSON.parse(customerString));
 
-    const totalPages = Math.ceil(totalRecords[0]?.totalRecords / parseInt(limit)) || 0;
-
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       data: {
-        customers,
-        sort,
-        limit: parseInt(limit),
-        offset: parseInt(offset),
-        totalPages,
-        totalRecords: totalRecords[0]?.totalRecords || 0,
+        customers: uniqueCustomers,
       },
     });
   } catch (error) {
     handleHttpError(res, "ERROR_GET_CUSTOMERS");
   }
 };
+
 
 const getCustomerById = async (req, res) => {
   try {

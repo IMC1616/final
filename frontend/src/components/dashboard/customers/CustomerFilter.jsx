@@ -8,9 +8,11 @@ const CustomerFilter = ({
   setSearchCi,
   searchMeterCode,
   setSearchMeterCode,
+  selectedCategory,
+  setSelectedCategory,
+  selectedMeterStatus,
+  setSelectedMeterStatus
 }) => {
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedMeterStatus, setSelectedMeterStatus] = useState("");
 
   const handleChangeMeterStatus = (event) => {
     setSelectedMeterStatus(event.target.value);
@@ -68,6 +70,9 @@ const CustomerFilter = ({
           select
           sx={{ mr: 2, minWidth: "200px" }}
         >
+          <MenuItem value="">
+            <em>Ninguna</em>
+          </MenuItem>
           {fetchedDataCategories.data.categories.map((category) => (
             <MenuItem key={category._id} value={category._id}>
               {category.name} - Precio:{" "}
@@ -89,6 +94,9 @@ const CustomerFilter = ({
           select
           sx={{ minWidth: "200px" }}
         >
+          <MenuItem value="">
+            <em>Ninguno</em>
+          </MenuItem>
           {Object.entries(meterStatuses).map(([key, value]) => (
             <MenuItem key={key} value={key}>
               {value}

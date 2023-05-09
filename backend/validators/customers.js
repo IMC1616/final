@@ -2,20 +2,22 @@ const { check, param, query } = require("express-validator");
 const validateResults = require("../utils/handleValidator");
 
 const searchCustomersValidator = [
-  query("offset")
+  query("ci")
     .optional()
-    .isInt({ min: 0 })
-    .withMessage(
-      "The 'offset' value must be an integer equal to or greater than 0."
-    ),
-  query("limit")
+    .isString()
+    .withMessage("El valor de 'ci' debe ser una cadena de caracteres."),
+  query("code")
     .optional()
-    .isInt({ min: 1 })
-    .withMessage("The 'limit' value must be an integer greater than 0."),
-  query("sort")
+    .isString()
+    .withMessage("El valor de 'code' debe ser una cadena de caracteres."),
+  query("category")
     .optional()
-    .isIn(["asc", "desc"])
-    .withMessage("The 'sort' value must be 'asc' or 'desc'."),
+    .isString()
+    .withMessage("El valor de 'category' debe ser una cadena de caracteres."),
+  query("status")
+    .optional()
+    .isString()
+    .withMessage("El valor de 'status' debe ser una cadena de caracteres."),
   (req, res, next) => {
     return validateResults(req, res, next);
   },

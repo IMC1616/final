@@ -2,6 +2,16 @@ import { apiSlice } from "../apiSlice";
 
 const customersEndpoint = apiSlice.injectEndpoints({
   endpoints: (build) => ({
+    searchCustomers: build.query({
+      query: (url) => url,
+      providesTags: (result) => [
+        ...result?.data?.customers.map((customer) => ({
+          type: "Customer",
+          id: customer._id,
+        })),
+        { type: "Customer", id: "LIST" },
+      ],
+    }),
     getCustomers: build.query({
       query: (url) => url,
       providesTags: (result) => [
@@ -170,6 +180,7 @@ const customersEndpoint = apiSlice.injectEndpoints({
 });
 
 export const {
+  useSearchCustomersQuery,
   useGetCustomersQuery,
   useGetCustomerByIdQuery,
   useGetCustomerPropertiesQuery,
