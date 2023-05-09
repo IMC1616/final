@@ -9,12 +9,16 @@ const NotificationScheme = new mongoose.Schema(
     },
     viewedAt: {
       type: Date,
-      required: true,
     },
     invoice: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: 'Invoices',
+    },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: 'Users',
     },
   },
   {

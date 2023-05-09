@@ -7,5 +7,8 @@ require("dotenv").config();
 // Inicializar la instancia del server
 const server = new Server();
 
+// Requiere e inicia el cron job
+require("./cronJob");
+
 // Ejecutar el server
 server.execute();

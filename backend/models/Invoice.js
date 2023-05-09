@@ -13,15 +13,16 @@ const InvoiceScheme = new mongoose.Schema(
     },
     paymentStatus: {
       type: String,
+      enum: ['pending', 'paid'],
       required: true,
     },
     consumption: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: 'Consumptions',
     },
     user: {
-      type: Schema.Types.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: 'Users',
     },
