@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Helmet } from "react-helmet-async";
 import { Box, Button, Container, Grid, Typography } from "@mui/material";
@@ -30,7 +30,7 @@ const Customers = () => {
           >
             <Grid item>
               <Typography color="textPrimary" variant="h5">
-                Clientes
+                Socios
               </Typography>
             </Grid>
             <Grid item>
@@ -40,7 +40,9 @@ const Customers = () => {
                   startIcon={<PlusIcon />}
                   sx={{ m: 1, fontSize: { lg: 14, md: 13, sm: 12, xs: 11 } }}
                   onClick={() =>
-                    dispatch(openModal({ component: "customer", type: "create" }))
+                    dispatch(
+                      openModal({ component: "customer", type: "create" })
+                    )
                   }
                   variant="contained"
                 >

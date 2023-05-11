@@ -52,17 +52,17 @@ const DashboardSidebar = (props) => {
       title: "Administración",
       items: [
         {
-          title: "Clientes",
+          title: "Socios",
           path: "/dashboard/customers",
           icon: <UsersIcon fontSize="small" />,
           roles: ["admin"],
         },
-        // {
-        //   title: "Facturas",
-        //   path: "/dashboard/invoices",
-        //   icon: <ReceiptLongIcon fontSize="small" />,
-        //   roles: ["admin"],
-        // },
+        {
+          title: "Cobranzas",
+          path: "/dashboard/invoices",
+          icon: <ReceiptLongIcon fontSize="small" />,
+          roles: ["admin"],
+        },
         // {
         //   title: "Medidores",
         //   path: "/dashboard/meters",

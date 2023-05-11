@@ -101,9 +101,9 @@ const CustomerConsumptionsModal = ({
           _id: data?._id,
           readingDate: new Date(data?.readingDate) || new Date(),
           previousReading:
-            data?.previousReading || lastConsumption.currentReading || 0,
+            data?.previousReading || lastConsumption?.currentReading || 0,
           currentReading:
-            data?.currentReading || lastConsumption.currentReading + 10,
+            data?.currentReading || lastConsumption?.currentReading + 10,
           consumptionCubicMeters: data?.consumptionCubicMeters || "",
           meter: data?.meter || selectedMeter,
           submit: null,

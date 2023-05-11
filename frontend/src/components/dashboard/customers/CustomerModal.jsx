@@ -1,5 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
 import * as Yup from "yup";
 import { Formik } from "formik";
 import toast from "react-hot-toast";
@@ -21,7 +22,8 @@ import {
 import { selectModalData } from "../../../features/modal/modalSlice";
 
 const CustomerModal = ({ isOpen, handleClose }) => {
-  const data = useSelector(selectModalData);
+  const invoice = useSelector(selectModalData);
+  const history = useHistory();
 
   const [createCustomer] = useCreateCustomerMutation();
   const [updateCustomer] = useUpdateCustomerMutation();
@@ -32,7 +34,7 @@ const CustomerModal = ({ isOpen, handleClose }) => {
   ) => {
     try {
       let resultAction;
-      if (data?._id) {
+      if (invoice?._id) {
         resultAction = await updateCustomer(values).unwrap();
         toast.success("Cliente actualizado!");
       } else {
@@ -43,6 +45,9 @@ const CustomerModal = ({ isOpen, handleClose }) => {
       setStatus({ success: true });
       setSubmitting(false);
       handleClose();
+
+      history.push(`/dashboard/invoices/${invoice._id}`);
+
       return resultAction;
     } catch (error) {
       console.error(error);
@@ -70,13 +75,13 @@ const CustomerModal = ({ isOpen, handleClose }) => {
     <Dialog fullWidth maxWidth="md" open={isOpen} onClose={handleClose}>
       <Formik
         initialValues={{
-          _id: data?._id,
-          name: data?.name,
-          lastName: data?.lastName,
-          ci: data?.ci,
-          email: data?.email,
-          phone: data?.phone,
-          role: data?.role || "admin",
+          _id: invoice?._id,
+          name: invoice?.name,
+          lastName: invoice?.lastName,
+          ci: invoice?.ci,
+          email: invoice?.email,
+          phone: invoice?.phone,
+          role: invoice?.role || "admin",
           submit: null,
         }}
         validationSchema={Yup.object().shape({
@@ -116,7 +121,7 @@ const CustomerModal = ({ isOpen, handleClose }) => {
           <form onSubmit={handleSubmit}>
             <Box sx={{ p: 3 }}>
               <DialogTitle id="form-dialog-title">
-                {data ? "Editar Cliente" : "Crear Cliente"}
+                {invoice ? "Editar Cliente" : "Crear Cliente"}
               </DialogTitle>
               <Divider />
               <DialogContent>
@@ -212,7 +217,7 @@ const CustomerModal = ({ isOpen, handleClose }) => {
                     disabled={isSubmitting}
                     type="submit"
                   >
-                    {data ? "Guardar Cambios" : "Crear Cliente"}
+                    {invoice ? "Guardar Cambios" : "Crear Cliente"}
                   </Button>
                 </Box>
               </Box>

@@ -19,16 +19,23 @@ const Overview = Loadable(
 const Account = Loadable(
   lazy(() => import("./pages/dashboard/account/Account"))
 );
+
 const Invoices = Loadable(
   lazy(() => import("./pages/dashboard/invoices/Invoices"))
 );
+const InvoiceOverview = Loadable(
+  lazy(() => import("./pages/dashboard/invoices/InvoiceOverview"))
+);
+
 const Meters = Loadable(lazy(() => import("./pages/dashboard/meters/Meters")));
+
 const Customers = Loadable(
   lazy(() => import("./pages/dashboard/customers/Customers"))
 );
 const CustomerOverview = Loadable(
   lazy(() => import("./pages/dashboard/customers/CustomerOverview"))
 );
+
 const Categories = Loadable(
   lazy(() => import("./pages/dashboard/categories/Categories"))
 );
@@ -65,7 +72,19 @@ const routes = [
           },
         ],
       },
-      { path: "invoices", element: <Invoices /> },
+      {
+        path: "invoices",
+        children: [
+          {
+            index: true,
+            element: <Invoices />,
+          },
+          {
+            path: ":invoiceId",
+            element: <InvoiceOverview />, // TODO: Add guard to this route
+          },
+        ],
+      },
       { path: "categories", element: <Categories /> },
       { path: "meters", element: <Meters /> },
       { path: "users", element: <Users /> },

@@ -20,3 +20,15 @@ export const meterStatuses = {
   damaged: "Dañado",
   suspended: "Suspendido",
 };
+
+
+export const statusMap = {
+  paid: {
+    label: "Pagado",
+    color: "success",
+  },
+  pending: {
+    label: "Pendiente",
+    color: "warning",
+  },
+};

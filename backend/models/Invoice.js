@@ -1,8 +1,9 @@
 const mongoose = require('mongoose')
 const mongooseDelete = require('mongoose-delete')
 
-const InvoiceScheme = new mongoose.Schema(
+const InvoiceSchema = new mongoose.Schema(
   {
+    // TODO: agregar número de factura
     invoiceDate: {
       type: Date,
       required: true,
@@ -15,6 +16,9 @@ const InvoiceScheme = new mongoose.Schema(
       type: String,
       enum: ['pending', 'paid'],
       required: true,
+    },
+    paymentDate: {
+      type: Date,
     },
     consumption: {
       type: mongoose.Schema.Types.ObjectId,
@@ -31,7 +35,7 @@ const InvoiceScheme = new mongoose.Schema(
     timestamps: true,
     versionKey: false,
   },
-)
+);
 
-InvoiceScheme.plugin(mongooseDelete, { overrideMethods: 'all' })
-module.exports = mongoose.model('Invoices', InvoiceScheme)
+InvoiceSchema.plugin(mongooseDelete, { overrideMethods: 'all' })
+module.exports = mongoose.model('Invoices', InvoiceSchema)
