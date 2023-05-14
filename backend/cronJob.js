@@ -85,15 +85,22 @@ const createInvoicesAndNotifications = async () => {
       },
     });
 
-    console.log(
-      "🚀 ~ file: cronJob.js:64 ~ createInvoicesAndNotifications ~ consumptions:",
-      consumptions
-    );
-
     for (const consumption of consumptions) {
       // Extrae la propiedad y el usuario del medidor.
       const property = consumption.meter.property;
       const user = property.user;
+
+      // Verifica si ya existe una factura para este consumo.
+      const existingInvoice = await Invoice.findOne({
+        consumption: consumption._id,
+      });
+
+      if (existingInvoice) {
+        console.log(
+          `Ya existe una factura para el consumo con ID ${consumption._id}. Se omite la creación de una nueva factura.`
+        );
+        continue; // Salta al siguiente ciclo del bucle for.
+      }
 
       // Calcula el monto total de la factura.
       const totalAmount = await calculateTotalAmount(
@@ -103,7 +110,7 @@ const createInvoicesAndNotifications = async () => {
 
       // Crea una nueva factura.
       const newInvoice = new Invoice({
-        invoiceDate: new Date(),
+        invoiceDate: consumption.readingDate,
         totalAmount,
         paymentStatus: "pending",
         consumption: consumption._id,
@@ -123,6 +130,7 @@ const createInvoicesAndNotifications = async () => {
 
 // Ejecuta el cron-job el día 10 de cada mes a las 00:00 horas.
 cron.schedule("0 0 10 * *", () => {
+  // cron.schedule("* * * * *", () => {
   console.log("Ejecutando cron-job para crear facturas y notificaciones.");
   createInvoicesAndNotifications();
 });

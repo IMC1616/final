@@ -52,7 +52,7 @@ const routes = [
   {
     path: "dashboard",
     element: (
-      <RoleBaseGuard roles={["user", "reader", "admin"]}>
+      <RoleBaseGuard roles={["customer", "reader", "admin"]}>
         <DashboardLayout />
       </RoleBaseGuard>
     ),

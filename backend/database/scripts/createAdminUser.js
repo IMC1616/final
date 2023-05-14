@@ -1,5 +1,5 @@
 require("dotenv").config();
-const User = require("../../models/user");
+const User = require("../../models/User");
 const { dbConnection } = require("../config");
 const { encrypt } = require("../../utils/handlePassword");
 
@@ -24,6 +24,7 @@ const createAdminUser = async () => {
         lastName: adminLastName,
         email: adminEmail,
         password: hashedPassword,
+        ci: "00000000",
         role: "admin",
       });
 

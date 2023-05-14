@@ -14,7 +14,7 @@ const LoginJWT = (props) => {
   return (
     <Formik
       initialValues={{
-        email: "dev.morales.jordy@gmail.com",
+        email: "gustavoyampara1616@gmail.com",
         password: "NdeiPDv",
         submit: null,
       }}
@@ -104,7 +104,7 @@ const LoginJWT = (props) => {
           <Box sx={{ mt: 2 }}>
             <Alert severity="info">
               <div>
-                Usa <b>dev.morales.jordy@gmail.com</b> y <b>NdeiPDv</b>
+                Usa <b>gustavoyampara1616@gmail.com</b> y <b>NdeiPDv</b>
               </div>
             </Alert>
           </Box>

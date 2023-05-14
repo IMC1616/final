@@ -5,6 +5,7 @@ const {
   createUserValidator,
   updateUserValidator,
   deleteUserValidator,
+  getUserDebtsValidator,
 } = require("../validators/users");
 const isAuthenticated = require("../middlewares/isAuthenticated");
 const isAuthorized = require("../middlewares/isAuthorized");
@@ -24,6 +25,8 @@ router.get(
 );
 
 router.get("/:userId/meters", [isAuthenticated], userController.getUserMeters);
+
+router.get("/:userId/debts", [getUserDebtsValidator, isAuthenticated], userController.getUserDebts);
 
 router.get("/:userId/consumptions", [isAuthenticated], userController.getUserConsumptions);
 

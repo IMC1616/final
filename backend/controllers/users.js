@@ -2,6 +2,7 @@ const User = require("../models/User");
 const Property = require("../models/Property");
 const Meter = require("../models/Meter");
 const Consumption = require("../models/Consumption");
+const Invoice = require("../models/Invoice");
 const { matchedData } = require("express-validator");
 const { handleHttpError } = require("../utils/handleError");
 const generatePassword = require("../utils/generatePassword");
@@ -54,7 +55,7 @@ const getUsers = async (req, res) => {
         select,
         query,
         totalPages,
-        totalRecords, 
+        totalRecords,
       },
     });
   } catch (error) {
@@ -100,6 +101,68 @@ const getUserMeters = async (req, res) => {
   }
 };
 
+const getUserDebts = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { startDate, endDate } = req.query;
+
+    let unpaidInvoices;
+    if (startDate && endDate) {
+      unpaidInvoices = await Invoice.find({
+        user: userId,
+        invoiceDate: {
+          $gte: new Date(startDate),
+          $lte: new Date(endDate)
+        },
+        paymentStatus: 'pending'
+      }).populate('user');
+    } else {
+      unpaidInvoices = await Invoice.find({
+        user: userId,
+        paymentStatus: 'pending'
+      }).populate('user');
+    }
+
+    const userDebts = unpaidInvoices.reduce((acc, invoice) => {
+      if (!acc) {
+        acc = {
+          userInfo: invoice.user,
+          totalDebt: 0,
+          monthlyDetails: {}
+        };
+      }
+
+      acc.totalDebt += invoice.totalAmount;
+
+      const invoiceMonth = invoice.invoiceDate.getMonth() + 1;
+      if (!acc.monthlyDetails[invoiceMonth]) {
+        acc.monthlyDetails[invoiceMonth] = 0;
+      }
+      acc.monthlyDetails[invoiceMonth] += invoice.totalAmount;
+
+      return acc;
+    }, null);
+
+    if (!userDebts) {
+      return res.status(404).json({
+        success: false,
+        message: 'No se encontraron facturas impagas para el usuario especificado'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: userDebts
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: 'Hubo un error al obtener los informes de impagos'
+    });
+  }
+};
+
 const getUserConsumptions = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -137,7 +200,6 @@ const getUserConsumptions = async (req, res) => {
     handleHttpError(res, "ERROR_GET_USER_CONSUMPTIONS");
   }
 };
-
 
 const createUser = async (req, res) => {
   try {
@@ -215,6 +277,7 @@ module.exports = {
   getUsers,
   getUserProperties,
   getUserMeters,
+  getUserDebts,
   getUserConsumptions,
   createUser,
   updateUser,

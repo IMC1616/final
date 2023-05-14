@@ -56,9 +56,28 @@ const deleteUserValidator = [
   },
 ];
 
+
+const getUserDebtsValidator = [
+  query("startDate")
+    .optional()
+    .isISO8601()
+    .withMessage(
+      "La fecha de inicio 'startDate' debe estar en formato ISO 8601 (YYYY-MM-DD)."
+    ),
+  query("endDate")
+    .optional()
+    .isISO8601()
+    .withMessage(
+      "La fecha de fin 'endDate' debe estar en formato ISO 8601 (YYYY-MM-DD)."
+    ),
+  (req, res, next) => {
+    return validateResults(req, res, next);
+  },
+];
 module.exports = {
   getUsersValidator,
   createUserValidator,
   updateUserValidator,
   deleteUserValidator,
+  getUserDebtsValidator,
 };
