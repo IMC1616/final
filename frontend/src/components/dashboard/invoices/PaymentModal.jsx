@@ -1,5 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import {
   Dialog,
@@ -16,6 +17,7 @@ import { usePayInvoiceMutation } from "../../../services/endpoints/invoices";
 
 const PaymentModal = ({ isOpen, handleClose }) => {
   const invoice = useSelector(selectModalData);
+  const navigate = useNavigate();
 
   const [payInvoice] = usePayInvoiceMutation();
 
@@ -25,6 +27,9 @@ const PaymentModal = ({ isOpen, handleClose }) => {
       toast.success("Factura pagada con éxito!");
 
       handleClose();
+
+      navigate(`/dashboard/invoices/${invoice._id}`);
+
       return resultAction;
     } catch (error) {
       console.error(error);
