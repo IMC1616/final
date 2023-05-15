@@ -24,6 +24,7 @@ import {
   selectSelectedProperty,
 } from "../../../features/customers/customerSlice";
 import CustomerPropertiesModal from "./CustomerPropertiesModal";
+import Guard from "../../Guards/Guard";
 
 const CustomerProperties = ({ customerId }) => {
   const dispatch = useDispatch();
@@ -52,8 +53,6 @@ const CustomerProperties = ({ customerId }) => {
       }
     }
   }, [customerPropertiesData, dispatch]);
-  
-
   const handleCloseModal = useCallback(() => {
     dispatch(closeModal());
   }, [dispatch]);
@@ -90,39 +89,41 @@ const CustomerProperties = ({ customerId }) => {
                     </Marker>
                   </MapContainer>
 
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "10px",
-                      right: "20px",
-                      zIndex: 1000,
-                    }}
-                  >
-                    <Tooltip placement="left" title="Editar propiedad">
-                      <IconButton
-                        edge="end"
-                        sx={{
-                          color: "white",
-                          backgroundColor: "primary.main",
-                          borderRadius: "4px",
-                          "&:hover": {
-                            backgroundColor: "primary.dark",
-                          },
-                        }}
-                        onClick={() => {
-                          dispatch(
-                            openModal({
-                              component: "property",
-                              type: "edit",
-                              data: property,
-                            })
-                          );
-                        }}
-                      >
-                        <Edit />
-                      </IconButton>
-                    </Tooltip>
-                  </div>
+                  <Guard item roles={["admin"]}>
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "10px",
+                        right: "20px",
+                        zIndex: 1000,
+                      }}
+                    >
+                      <Tooltip placement="left" title="Editar propiedad">
+                        <IconButton
+                          edge="end"
+                          sx={{
+                            color: "white",
+                            backgroundColor: "primary.main",
+                            borderRadius: "4px",
+                            "&:hover": {
+                              backgroundColor: "primary.dark",
+                            },
+                          }}
+                          onClick={() => {
+                            dispatch(
+                              openModal({
+                                component: "property",
+                                type: "edit",
+                                data: property,
+                              })
+                            );
+                          }}
+                        >
+                          <Edit />
+                        </IconButton>
+                      </Tooltip>
+                    </div>
+                  </Guard>
                 </div>
               ) : (
                 <Typography color="error">

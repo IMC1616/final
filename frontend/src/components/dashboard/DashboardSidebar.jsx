@@ -15,6 +15,13 @@ import NavSection from "../NavSection";
 import Scrollbar from "../Scrollbar";
 import { useSelector } from "react-redux";
 import { selectCurrentUser } from "../../features/auth/authSlice";
+import Guard from "../Guards/Guard";
+
+const roles = {
+  admin: "Administrador",
+  reader: "Lector",
+  customer: "Socio",
+};
 
 const DashboardSidebar = (props) => {
   const { onMobileClose, openMobile } = props;
@@ -38,7 +45,7 @@ const DashboardSidebar = (props) => {
       items: [
         {
           title: "Visión general",
-          path: "/dashboard/overview",
+          path: "/dashboard",
           icon: <ChartSquareBarIcon fontSize="small" />,
         },
         // {
@@ -47,6 +54,7 @@ const DashboardSidebar = (props) => {
         //   icon: <UserIcon fontSize="small" />,
         // },
       ],
+      roles: ["customer", "reader", "admin"],
     },
     {
       title: "Administración",
@@ -55,13 +63,13 @@ const DashboardSidebar = (props) => {
           title: "Socios",
           path: "/dashboard/customers",
           icon: <UsersIcon fontSize="small" />,
-          roles: ["admin"],
+          roles: ["reader", "admin"],
         },
         {
           title: "Cobranzas",
           path: "/dashboard/invoices",
           icon: <ReceiptLongIcon fontSize="small" />,
-          roles: ["admin"],
+          roles: ["reader", "admin"],
         },
         // {
         //   title: "Medidores",
@@ -82,6 +90,7 @@ const DashboardSidebar = (props) => {
           roles: ["admin"],
         },
       ],
+      roles: ["reader", "admin"],
     },
   ];
 
@@ -139,25 +148,27 @@ const DashboardSidebar = (props) => {
                 {user.name} {user.lastName}
               </Typography>
               <Typography color="textSecondary" variant="body2">
-                role: {user.role}
+                {roles[user.role]}
               </Typography>
             </Box>
           </Box>
         </Box>
         <Divider />
         <Box sx={{ p: 2 }}>
-          {sections.map((section) => (
-            <NavSection
-              key={section.title}
-              pathname={location.pathname}
-              isPathActive={isPathActive}
-              sx={{
-                "& + &": {
-                  mt: 3,
-                },
-              }}
-              {...section}
-            />
+          {sections.map((section, index) => (
+            <Guard roles={section.roles} key={index}>
+              <NavSection
+                key={section.title}
+                pathname={location.pathname}
+                isPathActive={isPathActive}
+                sx={{
+                  "& + &": {
+                    mt: 3,
+                  },
+                }}
+                {...section}
+              />
+            </Guard>
           ))}
         </Box>
       </Scrollbar>

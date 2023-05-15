@@ -20,4 +20,10 @@ router.get(
   reportController.getUnpaid
 );
 
+router.get(
+  "/summary",
+  [isAuthenticated, isAuthorized(["reader", "admin"])],
+  reportController.getSummary
+);
+
 module.exports = router;

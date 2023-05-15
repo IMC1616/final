@@ -57,7 +57,7 @@ const routes = [
       </RoleBaseGuard>
     ),
     children: [
-      { path: "overview", element: <Overview /> },
+      { index: true, element: <Overview /> },
       { path: "account", element: <Account /> },
       {
         path: "customers",

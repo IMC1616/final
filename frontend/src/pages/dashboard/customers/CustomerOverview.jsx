@@ -20,6 +20,7 @@ import {
   selectSelectedMeter,
   selectSelectedProperty,
 } from "../../../features/customers/customerSlice";
+import Guard from "../../../components/Guards/Guard";
 
 const CustomerOverview = () => {
   const dispatch = useDispatch();
@@ -80,20 +81,22 @@ const CustomerOverview = () => {
                   alignItems="center"
                 >
                   <Typography variant="h6">Propiedades</Typography>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => {
-                      dispatch(
-                        openModal({
-                          component: "property",
-                          type: "create",
-                        })
-                      );
-                    }}
-                  >
-                    Agregar
-                  </Button>
+                  <Guard item roles={["admin"]}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => {
+                        dispatch(
+                          openModal({
+                            component: "property",
+                            type: "create",
+                          })
+                        );
+                      }}
+                    >
+                      Agregar
+                    </Button>
+                  </Guard>
                 </Box>
                 <CustomerProperties customerId={params.customerId} />
               </CardContent>
@@ -108,20 +111,22 @@ const CustomerOverview = () => {
                   alignItems="center"
                 >
                   <Typography variant="h6">Medidores</Typography>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => {
-                      dispatch(
-                        openModal({
-                          component: "meter",
-                          type: "create",
-                        })
-                      );
-                    }}
-                  >
-                    Agregar
-                  </Button>
+                  <Guard item roles={["admin"]}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => {
+                        dispatch(
+                          openModal({
+                            component: "meter",
+                            type: "create",
+                          })
+                        );
+                      }}
+                    >
+                      Agregar
+                    </Button>
+                  </Guard>
                 </Box>
                 {selectedProperty && (
                   <CustomerMeters propertyId={selectedProperty} />

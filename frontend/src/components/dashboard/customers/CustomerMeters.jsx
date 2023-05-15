@@ -24,6 +24,7 @@ import {
 } from "../../../features/customers/customerSlice";
 import CustomerMetersModal from "./CustomerMetersModal";
 import { meterStatuses } from "../../../constants";
+import Guard from "../../Guards/Guard";
 
 const getStatusBackgroundColor = (status) => {
   switch (status) {
@@ -122,39 +123,41 @@ const CustomerMeters = ({ propertyId }) => {
                   )}
                 </CardContent>
               </CardActionArea>
-              <div
-                style={{
-                  position: "absolute",
-                  top: "10px",
-                  right: "20px",
-                  zIndex: 1000,
-                }}
-              >
-                <Tooltip placement="left" title="Editar medidor">
-                  <IconButton
-                    edge="end"
-                    sx={{
-                      color: "white",
-                      backgroundColor: "primary.main",
-                      borderRadius: "4px",
-                      "&:hover": {
-                        backgroundColor: "primary.dark",
-                      },
-                    }}
-                    onClick={() => {
-                      dispatch(
-                        openModal({
-                          component: "meter",
-                          type: "edit",
-                          data: meter,
-                        })
-                      );
-                    }}
-                  >
-                    <Edit />
-                  </IconButton>
-                </Tooltip>
-              </div>
+              <Guard item roles={["admin"]}>
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "10px",
+                    right: "20px",
+                    zIndex: 1000,
+                  }}
+                >
+                  <Tooltip placement="left" title="Editar medidor">
+                    <IconButton
+                      edge="end"
+                      sx={{
+                        color: "white",
+                        backgroundColor: "primary.main",
+                        borderRadius: "4px",
+                        "&:hover": {
+                          backgroundColor: "primary.dark",
+                        },
+                      }}
+                      onClick={() => {
+                        dispatch(
+                          openModal({
+                            component: "meter",
+                            type: "edit",
+                            data: meter,
+                          })
+                        );
+                      }}
+                    >
+                      <Edit />
+                    </IconButton>
+                  </Tooltip>
+                </div>
+              </Guard>
             </div>
           </Card>
         </Grid>
