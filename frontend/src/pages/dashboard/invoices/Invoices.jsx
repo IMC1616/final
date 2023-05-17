@@ -65,7 +65,7 @@ const Invoices = () => {
                 spacing={3}
               >
                 <div>
-                  <Typography variant="h4">Facturas</Typography>
+                  <Typography variant="h4">Recibos</Typography>
                 </div>
                 <Stack alignItems="center" direction="row" spacing={1}>
                   <Button

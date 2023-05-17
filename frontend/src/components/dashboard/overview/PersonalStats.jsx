@@ -121,7 +121,7 @@ export const PersonalStats = ({ totalDebt = 0, monthlyDetails }) => {
               </Box>
               <div>
                 <Typography color="text.secondary" variant="body2">
-                  Facturas adeudadas
+                  Recibos
                 </Typography>
                 <Typography variant="h5">
                   {totalMonthsOwed}{" "}

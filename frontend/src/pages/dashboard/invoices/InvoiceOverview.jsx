@@ -72,7 +72,7 @@ const InvoiceOverview = () => {
                   <SvgIcon sx={{ mr: 1 }}>
                     <ArrowLeftIcon />
                   </SvgIcon>
-                  <Typography variant="subtitle2">Facturas</Typography>
+                  <Typography variant="subtitle2">Recibos</Typography>
                 </Link>
               </div>
               <Stack
