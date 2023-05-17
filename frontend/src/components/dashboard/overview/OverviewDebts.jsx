@@ -12,9 +12,8 @@ import {
 import { useGetUserDebtsQuery } from "../../../services/endpoints/users";
 import { selectCurrentUser } from "../../../features/auth/authSlice";
 import { PersonalStats } from "./PersonalStats";
-import ArrowRightIcon from "../../../icons/ArrowRight";
 import { DebtChart } from "./DebtChart";
-import RoleBaseGuard from "../../Guards/RoleBaseGuard";
+import Guard from "../../Guards/Guard";
 
 const OverviewDebts = () => {
   const user = useSelector(selectCurrentUser);
@@ -26,25 +25,26 @@ const OverviewDebts = () => {
     isSuccess: userDebtsSuccess,
   } = useGetUserDebtsQuery(user._id);
 
-
   if (userDebtsLoading) {
     return <div>Loading...</div>;
   }
 
   return (
     <div>
-      {userDebts && (
-        <Grid xs={12} md={12}>
+      <Guard roles={["customer"]}>
+        <Grid item xs={12} md={12}>
           <PersonalStats
-            totalDebt={userDebts.data.totalDebt}
-            monthlyDetails={userDebts.data.monthlyDetails}
+            totalDebt={userDebts?.data?.totalDebt}
+            monthlyDetails={userDebts?.data?.monthlyDetails}
           />
         </Grid>
-      )}
+      </Guard>
 
-      <Grid xs={12} md={12}>
-        <DebtChart />
-      </Grid>
+      <Guard item roles={["admin", "reader"]}>
+        <Grid xs={12} md={12}>
+          <DebtChart />
+        </Grid>
+      </Guard>
     </div>
   );
 };

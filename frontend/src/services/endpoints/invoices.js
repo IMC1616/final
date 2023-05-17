@@ -25,6 +25,8 @@ const invoicesEndpoint = apiSlice.injectEndpoints({
       }),
       invalidatesTags: (result, error, invoiceId) => [
         { type: "Invoice", id: invoiceId },
+        { type: "Report", id: "Unpaid" },
+        { type: "Report", id: "Summary" },
       ],
     }),
   }),

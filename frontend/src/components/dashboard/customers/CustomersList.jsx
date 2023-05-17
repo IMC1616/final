@@ -24,6 +24,7 @@ import {
 } from "../../../features/modal/modalSlice";
 import { useSearchCustomersQuery } from "../../../services/endpoints/customers";
 import DeleteConfirmationModal from "./DeleteConfirmationModal";
+import Guard from "../../Guards/Guard";
 
 const CustomersList = () => {
   const dispatch = useDispatch();
@@ -119,36 +120,38 @@ const CustomersList = () => {
                   </Typography>
                 </CardContent>
               </CardActionArea>
-              <CardActions>
-                <Button
-                  size="small"
-                  onClick={() => {
-                    dispatch(
-                      openModal({
-                        component: "customer",
-                        type: "edit",
-                        data: customer,
-                      })
-                    );
-                  }}
-                >
-                  Editar
-                </Button>
-                <Button
-                  size="small"
-                  onClick={() => {
-                    dispatch(
-                      openModal({
-                        component: "customer",
-                        type: "delete",
-                        data: customer,
-                      })
-                    );
-                  }}
-                >
-                  Eliminar
-                </Button>
-              </CardActions>
+              <Guard item roles={["admin"]}>
+                <CardActions>
+                  <Button
+                    size="small"
+                    onClick={() => {
+                      dispatch(
+                        openModal({
+                          component: "customer",
+                          type: "edit",
+                          data: customer,
+                        })
+                      );
+                    }}
+                  >
+                    Editar
+                  </Button>
+                  <Button
+                    size="small"
+                    onClick={() => {
+                      dispatch(
+                        openModal({
+                          component: "customer",
+                          type: "delete",
+                          data: customer,
+                        })
+                      );
+                    }}
+                  >
+                    Eliminar
+                  </Button>
+                </CardActions>
+              </Guard>
             </Card>
           </Grid>
         ))}

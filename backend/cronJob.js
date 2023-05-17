@@ -49,8 +49,7 @@ const sendNotification = async (user, consumption, invoice) => {
     const emailText = `Hola, ${user.name} ${user.lastName}.\n\nSe ha generado una nueva factura por tu consumo de agua. El monto total es de ${invoice.totalAmount}. Por favor, ingresa a tu cuenta para ver más detalles y realizar el pago.\n\nGracias.`;
 
     // Envía un correo electrónico al usuario.
-    // await sendEmail(user.email, emailSubject, emailText);
-    await sendEmail("dev.morales.jordy@gmail.com", emailSubject, emailText);
+    await sendEmail(user.email, emailSubject, emailText);
   } catch (error) {
     console.error("Error al enviar la notificación:", error);
     throw error;
@@ -130,7 +129,6 @@ const createInvoicesAndNotifications = async () => {
 
 // Ejecuta el cron-job el día 10 de cada mes a las 00:00 horas.
 cron.schedule("0 0 10 * *", () => {
-  // cron.schedule("* * * * *", () => {
   console.log("Ejecutando cron-job para crear facturas y notificaciones.");
   createInvoicesAndNotifications();
 });

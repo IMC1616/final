@@ -52,9 +52,50 @@ const getUnpaid = async (req, res) => {
   }
 };
 
+const getSummary = async (req, res) => {
+  const { startDate, endDate } = req.query;
+
+  try {
+    const unpaidInvoicesCount = await Invoice.countDocuments({
+      invoiceDate: { $gte: new Date(startDate), $lte: new Date(endDate) },
+      paymentStatus: 'pending',
+    });
+
+    const unpaidInvoicesAmount = await Invoice.aggregate([
+      { 
+        $match: { 
+          invoiceDate: { $gte: new Date(startDate), $lte: new Date(endDate) }, 
+          paymentStatus: 'pending' 
+        } 
+      },
+      { $group: { _id: null, total: { $sum: "$totalAmount" } } },
+    ]);
+
+    const paidInvoicesAmount = await Invoice.aggregate([
+      { 
+        $match: { 
+          invoiceDate: { $gte: new Date(startDate), $lte: new Date(endDate) }, 
+          paymentStatus: 'paid' 
+        } 
+      },
+      { $group: { _id: null, total: { $sum: "$totalAmount" } } },
+    ]);
+
+    res.json({
+      unpaidInvoicesCount,
+      unpaidInvoicesAmount:
+        unpaidInvoicesAmount.length > 0 ? unpaidInvoicesAmount[0].total : 0,
+      paidInvoicesAmount:
+        paidInvoicesAmount.length > 0 ? paidInvoicesAmount[0].total : 0,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
 
 
 module.exports = {
   getIncomes,
   getUnpaid,
+  getSummary
 };
