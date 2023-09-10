@@ -21,7 +21,7 @@ import {
   useUpdateMeterConsumptionMutation,
 } from "../../../services/endpoints/customers";
 import { selectSelectedMeter } from "../../../features/customers/customerSlice";
-import { formatISO } from 'date-fns';
+import { formatISO } from "date-fns";
 
 function findLastConsumption(data) {
   if (!data || !data.length) {
@@ -56,7 +56,7 @@ const CustomerConsumptionsModal = ({
         ...values,
         readingDate: formatISO(values.readingDate),
       };
-  
+
       let resultAction;
       if (data?._id) {
         resultAction = await updateConsumption(payload).unwrap();
@@ -73,15 +73,15 @@ const CustomerConsumptionsModal = ({
       console.error(error);
       setStatus({ success: false });
       setSubmitting(false);
-  
+
       if (error.data) {
         const serverErrors = error.data.errors;
         const formErrors = {};
-  
+
         serverErrors.forEach((err) => {
           formErrors[err.param] = err.msg;
         });
-  
+
         setErrors(formErrors);
         toast.error("Por favor, corrija los errores en el formulario.");
       } else {
@@ -90,7 +90,6 @@ const CustomerConsumptionsModal = ({
       }
     }
   };
-  
 
   const lastConsumption = findLastConsumption(meterConsumptionsData?.data);
 
@@ -99,11 +98,14 @@ const CustomerConsumptionsModal = ({
       <Formik
         initialValues={{
           _id: data?._id,
-          readingDate: new Date(data?.readingDate) || new Date(),
+          readingDate: data?.readingDate
+            ? new Date(data?.readingDate)
+            : new Date(),
+
           previousReading:
             data?.previousReading || lastConsumption?.currentReading || 0,
           currentReading:
-            data?.currentReading || lastConsumption?.currentReading + 10,
+            data?.currentReading || lastConsumption?.currentReading,
           consumptionCubicMeters: data?.consumptionCubicMeters || "",
           meter: data?.meter || selectedMeter,
           submit: null,
@@ -130,6 +132,8 @@ const CustomerConsumptionsModal = ({
           ),
           meter: Yup.string().required("El medidor es requerido"),
         })}
+        validateOnBlur={true}
+        validateOnChange={true}
         onSubmit={handleSubmit}
       >
         {({

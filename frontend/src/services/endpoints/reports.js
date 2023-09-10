@@ -9,6 +9,13 @@ const reportsEndpoint = apiSlice.injectEndpoints({
       }),
       providesTags: [{ type: "Report", id: "Unpaid" }],
     }),
+    getIncomes: build.query({
+      query: ({ startDate, endDate }) => ({
+        url: `/reports/income?startDate=${startDate}&endDate=${endDate}`,
+        method: "GET",
+      }),
+      providesTags: [{ type: "Report", id: "Incomes" }],
+    }),
     getSummary: build.query({
       query: ({ startDate, endDate }) => ({
         url: `/reports/summary?startDate=${startDate}&endDate=${endDate}`,
@@ -19,4 +26,5 @@ const reportsEndpoint = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useGetUnpaidQuery, useGetSummaryQuery } = reportsEndpoint;
+export const { useGetUnpaidQuery, useGetIncomesQuery, useGetSummaryQuery } =
+  reportsEndpoint;

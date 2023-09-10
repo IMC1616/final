@@ -2,6 +2,40 @@ const Invoice = require("../models/Invoice");
 
 const getIncomes = async (req, res) => {
   try {
+    const { startDate, endDate } = req.query; // estas fechas las recibes en el formato YYYY-MM-DD
+
+    const unpaidInvoices = await Invoice.find({
+      invoiceDate: {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate),
+      },
+      paymentStatus: "paid",
+    }).populate("user");
+
+    const usersDebts = unpaidInvoices.reduce((acc, invoice) => {
+      if (!acc[invoice.user._id]) {
+        acc[invoice.user._id] = {
+          userInfo: invoice.user,
+          totalAmount: 0,
+          monthlyDetails: {},
+        };
+      }
+
+      acc[invoice.user._id].totalAmount += invoice.totalAmount;
+
+      const invoiceMonth = invoice.invoiceDate.getMonth() + 1; // getMonth() devuelve un índice base 0
+      if (!acc[invoice.user._id].monthlyDetails[invoiceMonth]) {
+        acc[invoice.user._id].monthlyDetails[invoiceMonth] = 0;
+      }
+      acc[invoice.user._id].monthlyDetails[invoiceMonth] += invoice.totalAmount;
+
+      return acc;
+    }, {});
+
+    res.status(200).json({
+      success: true,
+      data: Object.values(usersDebts),
+    });
   } catch (error) {
     handleHttpError(res, "ERROR_GET_INCOMES");
   }
@@ -58,25 +92,25 @@ const getSummary = async (req, res) => {
   try {
     const unpaidInvoicesCount = await Invoice.countDocuments({
       invoiceDate: { $gte: new Date(startDate), $lte: new Date(endDate) },
-      paymentStatus: 'pending',
+      paymentStatus: "pending",
     });
 
     const unpaidInvoicesAmount = await Invoice.aggregate([
-      { 
-        $match: { 
-          invoiceDate: { $gte: new Date(startDate), $lte: new Date(endDate) }, 
-          paymentStatus: 'pending' 
-        } 
+      {
+        $match: {
+          invoiceDate: { $gte: new Date(startDate), $lte: new Date(endDate) },
+          paymentStatus: "pending",
+        },
       },
       { $group: { _id: null, total: { $sum: "$totalAmount" } } },
     ]);
 
     const paidInvoicesAmount = await Invoice.aggregate([
-      { 
-        $match: { 
-          invoiceDate: { $gte: new Date(startDate), $lte: new Date(endDate) }, 
-          paymentStatus: 'paid' 
-        } 
+      {
+        $match: {
+          invoiceDate: { $gte: new Date(startDate), $lte: new Date(endDate) },
+          paymentStatus: "paid",
+        },
       },
       { $group: { _id: null, total: { $sum: "$totalAmount" } } },
     ]);
@@ -93,9 +127,8 @@ const getSummary = async (req, res) => {
   }
 };
 
-
 module.exports = {
   getIncomes,
   getUnpaid,
-  getSummary
+  getSummary,
 };

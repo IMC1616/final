@@ -23,33 +23,35 @@ const searchCustomers = async (req, res) => {
       });
     }
 
-    let meterConditions = {};
-
-    if (code) {
-      meterConditions.code = code;
-    }
-
-    if (category) {
-      meterConditions.category = category;
-    }
-
-    if (status) {
-      meterConditions.status = status;
-    }
-
     let customers = [];
 
     if (ci) {
-      customers = await User.find({ ci, role: "customer" });
+      const customerFound = await User.findOne({ ci, role: "customer" });
 
-      if (customers.length === 0) {
-        return res.status(404).json({ message: "Usuario no encontrado" });
+      if (!customerFound) {
+        return res.status(404).json({
+          message: "Socio no encontrado con los criterios proporcionados.",
+        });
+      } else {
+        customers.push(customerFound);
       }
     }
 
-    const meters = await Meter.find(meterConditions);
+    if (code || category || status) {
+      let meterConditions = {};
 
-    if (meters.length > 0) {
+      if (code) meterConditions.code = code;
+      if (category) meterConditions.category = category;
+      if (status) meterConditions.status = status;
+
+      const meters = await Meter.find(meterConditions);
+
+      if (meters.length === 0) {
+        return res.status(404).json({
+          message: "Socio no encontrado con los criterios proporcionados.",
+        });
+      }
+
       const propertyIds = meters.map((meter) => meter.property);
       const properties = await Property.find({ _id: { $in: propertyIds } });
 
@@ -60,12 +62,14 @@ const searchCustomers = async (req, res) => {
       });
 
       customers = customers.concat(matchedUsers);
-    } else {
-      return res.status(404).json({ message: "Medidor no encontrado" });
     }
 
-    const uniqueCustomersSet = new Set(customers.map((customer) => JSON.stringify(customer)));
-    const uniqueCustomers = Array.from(uniqueCustomersSet).map((customerString) => JSON.parse(customerString));
+    const uniqueCustomersSet = new Set(
+      customers.map((customer) => JSON.stringify(customer))
+    );
+    const uniqueCustomers = Array.from(uniqueCustomersSet).map(
+      (customerString) => JSON.parse(customerString)
+    );
 
     return res.status(200).json({
       success: true,
@@ -77,7 +81,6 @@ const searchCustomers = async (req, res) => {
     handleHttpError(res, "ERROR_GET_CUSTOMERS");
   }
 };
-
 
 const getCustomerById = async (req, res) => {
   try {

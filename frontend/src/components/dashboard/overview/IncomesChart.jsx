@@ -1,11 +1,10 @@
 import { useState } from "react";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
+  PieChart,
+  Pie,
   Tooltip,
-  CartesianGrid,
+  Cell,
+  Legend,
   ResponsiveContainer,
 } from "recharts";
 import { startOfMonth, endOfMonth } from "date-fns";
@@ -18,7 +17,7 @@ import {
   Grid,
   Typography,
 } from "@mui/material";
-import { useGetUnpaidQuery } from "../../../services/endpoints/reports";
+import { useGetIncomesQuery } from "../../../services/endpoints/reports";
 
 const getCurrentMonthRange = () => {
   const now = new Date();
@@ -28,20 +27,25 @@ const getCurrentMonthRange = () => {
   };
 };
 
-export const DebtChart = () => {
+const getRandomColor = () =>
+  `#${Math.floor(Math.random() * 16777215).toString(16)}`;
+
+export const IncomesChart = () => {
   const { start, end } = getCurrentMonthRange();
 
   const [startDate, setStartDate] = useState(start);
   const [endDate, setEndDate] = useState(end);
 
-  const { data = [], isFetching } = useGetUnpaidQuery({
+  const { data = [], isFetching } = useGetIncomesQuery({
     startDate: startDate.toISOString().split("T")[0],
     endDate: endDate.toISOString().split("T")[0],
   });
 
+  const totalSum = data?.data?.reduce((acc, item) => acc + item.totalAmount, 0);
+
   return (
     <Card sx={{ mt: 3 }}>
-      <CardHeader title="Reporte de deudas" sx={{ pb: 0 }} />
+      <CardHeader title="Reporte de ingresos" sx={{ pb: 0 }} />
       <CardContent>
         <Grid container spacing={2}>
           <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
@@ -80,14 +84,26 @@ export const DebtChart = () => {
           <div>Cargando...</div>
         ) : data.data.length ? (
           <Box sx={{ mt: 4, overflowX: "auto" }}>
+            <Box sx={{ textAlign: "center", marginBottom: 2 }}>
+              <Typography variant="h6">Total: {totalSum}</Typography>
+            </Box>
             <ResponsiveContainer width="100%" height={500}>
-              <BarChart data={data.data}>
-                <XAxis dataKey="userInfo.name" />
-                <YAxis />
+              <PieChart>
+                <Pie
+                  dataKey="totalAmount"
+                  data={data.data}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={150}
+                  label={(entry) => entry.userInfo.name}
+                >
+                  {data.data.map((_, index) => (
+                    <Cell key={index} fill={getRandomColor()} />
+                  ))}
+                </Pie>
                 <Tooltip />
-                <CartesianGrid stroke="#f5f5f5" />
-                <Bar dataKey="totalDebt" fill="#ff7300" />
-              </BarChart>
+                <Legend />
+              </PieChart>
             </ResponsiveContainer>
           </Box>
         ) : (

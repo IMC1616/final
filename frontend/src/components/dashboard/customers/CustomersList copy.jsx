@@ -86,7 +86,6 @@ const CustomersList = () => {
 
   const {
     isLoading: isLoadingCustomers,
-    isFetching: isFetchingCustomers,
     isSuccess: isSuccessCustomers,
     data: fetchedDataCustomers,
     isError: isErrorCustomers,
@@ -97,6 +96,7 @@ const CustomersList = () => {
     if (isSuccessCustomers) {
       setDataCustomers(fetchedDataCustomers.data.customers);
     } else if (isErrorCustomers) {
+      // Limpiar datos anteriores en caso de error
       setDataCustomers([]);
     }
   }, [isSuccessCustomers, isErrorCustomers, fetchedDataCustomers]);
@@ -118,7 +118,7 @@ const CustomersList = () => {
         setSelectedMeterStatus={debouncedSetSelectedMeterStatus}
       />
 
-      {isFetchingCustomers && (
+      {isLoadingCustomers && (
         <Typography align="center">Cargando...</Typography>
       )}
 
@@ -128,63 +128,67 @@ const CustomersList = () => {
         </Typography>
       )}
 
-      {!isFetchingCustomers &&
-        isSuccessCustomers &&
-        dataCustomers.length > 0 && (
-          <Grid container spacing={2}>
-            {dataCustomers.map((customer) => (
-              <Grid key={customer._id} item xs={12} sm={6} md={6} lg={4} xl={4}>
-                <Card>
-                  <CardActionArea
-                    component={RouterLink}
-                    to={`/dashboard/customers/${customer._id}`}
-                  >
-                    <CardContent>
-                      <Typography gutterBottom variant="h5" component="div">
-                        {customer.name} {customer.lastName}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {customer.email}
-                      </Typography>
-                    </CardContent>
-                  </CardActionArea>
-                  <Guard item roles={["admin"]}>
-                    <CardActions>
-                      <Button
-                        size="small"
-                        onClick={() => {
-                          dispatch(
-                            openModal({
-                              component: "customer",
-                              type: "edit",
-                              data: customer,
-                            })
-                          );
-                        }}
-                      >
-                        Editar
-                      </Button>
-                      <Button
-                        size="small"
-                        onClick={() => {
-                          dispatch(
-                            openModal({
-                              component: "customer",
-                              type: "delete",
-                              data: customer,
-                            })
-                          );
-                        }}
-                      >
-                        Eliminar
-                      </Button>
-                    </CardActions>
-                  </Guard>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        )}
+      {isSuccessCustomers && dataCustomers.length === 0 && (
+        <Typography variant="h6" align="center" color="textSecondary">
+          No se encontraron clientes con los criterios de búsqueda.
+        </Typography>
+      )}
+
+      {isSuccessCustomers && dataCustomers.length > 0 && (
+        <Grid container spacing={2}>
+          {dataCustomers.map((customer) => (
+            <Grid key={customer._id} item xs={12} sm={6} md={6} lg={4} xl={4}>
+              <Card>
+                <CardActionArea
+                  component={RouterLink}
+                  to={`/dashboard/customers/${customer._id}`}
+                >
+                  <CardContent>
+                    <Typography gutterBottom variant="h5" component="div">
+                      {customer.name} {customer.lastName}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {customer.email}
+                    </Typography>
+                  </CardContent>
+                </CardActionArea>
+                <Guard item roles={["admin"]}>
+                  <CardActions>
+                    <Button
+                      size="small"
+                      onClick={() => {
+                        dispatch(
+                          openModal({
+                            component: "customer",
+                            type: "edit",
+                            data: customer,
+                          })
+                        );
+                      }}
+                    >
+                      Editar
+                    </Button>
+                    <Button
+                      size="small"
+                      onClick={() => {
+                        dispatch(
+                          openModal({
+                            component: "customer",
+                            type: "delete",
+                            data: customer,
+                          })
+                        );
+                      }}
+                    >
+                      Eliminar
+                    </Button>
+                  </CardActions>
+                </Guard>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      )}
 
       <CustomerModal
         isOpen={
