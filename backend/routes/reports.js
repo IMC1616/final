@@ -9,6 +9,12 @@ const isAuthorized = require("../middlewares/isAuthorized");
 const router = express.Router();
 
 router.get(
+  "/",
+  [isAuthenticated, isAuthorized(["reader", "admin"])],
+  reportController.getReport
+);
+
+router.get(
   "/income",
   [getIncomesValidator, isAuthenticated, isAuthorized(["reader", "admin"])],
   reportController.getIncomes
@@ -25,5 +31,7 @@ router.get(
   [isAuthenticated, isAuthorized(["reader", "admin"])],
   reportController.getSummary
 );
+
+
 
 module.exports = router;

@@ -5,8 +5,9 @@ import { useGetUserDebtsQuery } from "../../../services/endpoints/users";
 import { selectCurrentUser } from "../../../features/auth/authSlice";
 import { PersonalStats } from "./PersonalStats";
 import { DebtChart } from "./DebtChart";
-import { IncomesChart } from "./IncomesChart";
+// import { IncomesChart } from "./IncomesChart";
 import Guard from "../../Guards/Guard";
+import ReportTable from "./ReportTable";
 
 const OverviewDebts = () => {
   const user = useSelector(selectCurrentUser);
@@ -45,13 +46,16 @@ const OverviewDebts = () => {
       </Guard>
 
       <Guard roles={["admin", "reader"]}>
+        <Grid item xs={12}>
+          <ReportTable />
+        </Grid>
         <Grid container spacing={2}>
-          <Grid item xs={12} xl={6}>
+          <Grid item xs={12} xl={12}>
             <DebtChart />
           </Grid>
-          <Grid item xs={12} xl={6}>
+          {/* <Grid item xs={12} xl={12}>
             <IncomesChart />
-          </Grid>
+          </Grid> */}
         </Grid>
       </Guard>
     </>

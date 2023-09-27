@@ -1,4 +1,132 @@
 const Invoice = require("../models/Invoice");
+const Consumption = require("../models/Consumption");
+const Meter = require("../models/Meter");
+
+
+const getReport = async (req, res) => {
+  try {
+    const { startDate, endDate, offset = 0, limit = 10, sort = 'invoiceDate', select = '' } = req.query;
+
+    if (!startDate || !endDate) {
+      return res.status(400).json({
+        success: false,
+        message: "Se requieren las fechas de inicio y fin",
+      });
+    }
+
+    const query = {
+      invoiceDate: {
+        $gte: new Date(startDate),
+        $lte: new Date(endDate),
+      },
+      paymentStatus: "paid",
+    };
+
+    const queryBuilder = Invoice.find(query)
+      .skip(parseInt(offset))
+      .limit(parseInt(limit))
+      .sort(sort)
+      .populate({
+        path: 'user',
+        select: 'name lastName',
+      })
+      .populate({
+        path: 'consumption',
+        populate: {
+          path: 'meter',
+          select: 'code',
+        },
+      });
+
+    if (select) {
+      const fields = select.split(",").join(" ");
+      queryBuilder.select(fields);
+    }
+
+    const paidInvoices = await queryBuilder.exec();
+    const totalRecords = await Invoice.countDocuments(query);
+    const totalPages = Math.ceil(totalRecords / parseInt(limit));
+
+    const report = paidInvoices.map(invoice => ({
+      invoiceId: invoice._id,
+      meterCode: invoice.consumption ? invoice.consumption.meter.code : null,
+      date: invoice.invoiceDate,
+      userName: `${invoice.user.name} ${invoice.user.lastName}`,
+      amount: invoice.totalAmount,
+    }));
+
+    res.status(200).json({
+      success: true,
+      data: {
+        reports: report,
+        offset: parseInt(offset),
+        limit: parseInt(limit),
+        sort,
+        select,
+        totalPages,
+        totalRecords,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Hubo un error al obtener el reporte",
+    });
+  }
+};
+
+
+// const getReport = async (req, res) => {
+//   try {
+//     const { startDate, endDate } = req.query;
+    
+//     if (!startDate || !endDate) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Se requieren las fechas de inicio y fin",
+//       });
+//     }
+
+//     const paidInvoices = await Invoice.find({
+//       invoiceDate: {
+//         $gte: new Date(startDate),
+//         $lte: new Date(endDate),
+//       },
+//       paymentStatus: "paid",
+//     })
+//     .populate({
+//       path: 'user',
+//       select: 'name lastName',
+//     })
+//     .populate({
+//       path: 'consumption',
+//       populate: {
+//         path: 'meter',
+//         select: 'code',
+//       },
+//     });
+
+//     const report = paidInvoices.map(invoice => ({
+//       invoiceId: invoice._id,
+//       meterCode: invoice.consumption ? invoice.consumption.meter.code : null,
+//       date: invoice.invoiceDate,
+//       userName: `${invoice.user.name} ${invoice.user.lastName}`,
+//       amount: invoice.totalAmount,
+//     }));
+
+//     res.status(200).json({
+//       success: true,
+//       data: report,
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({
+//       success: false,
+//       message: "Hubo un error al obtener el reporte",
+//     });
+//   }
+// };
 
 const getIncomes = async (req, res) => {
   try {
@@ -128,6 +256,7 @@ const getSummary = async (req, res) => {
 };
 
 module.exports = {
+  getReport,
   getIncomes,
   getUnpaid,
   getSummary,
