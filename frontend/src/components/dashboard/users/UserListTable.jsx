@@ -14,6 +14,7 @@ import {
   selectModalType,
   selectModalComponent,
 } from "../../../features/modal/modalSlice";
+import { roles } from "../../../constants";
 
 const UserListTable = () => {
   const dispatch = useDispatch();
@@ -92,7 +93,13 @@ const UserListTable = () => {
         accessorKey: "role",
         header: "Role",
         filterVariant: "multi-select",
-        filterSelectOptions: ["admin", "user"],
+        filterSelectOptions: roles.map((role) => role.value),
+        Cell: ({ renderedCellValue }) => {
+          const roleObj = roles.find(
+            (role) => role.value === renderedCellValue
+          );
+          return roleObj ? roleObj.label : renderedCellValue;
+        },
       },
     ],
     []

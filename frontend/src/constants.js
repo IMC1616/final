@@ -5,8 +5,16 @@ export const THEMES = {
 
 export const roles = [
   {
+    label: "Socio",
+    value: "customer",
+  },
+  {
     label: "Lector",
     value: "reader",
+  },
+  {
+    label: "Cobrador",
+    value: "manifold",
   },
   {
     label: "Administrador",
@@ -20,7 +28,6 @@ export const meterStatuses = {
   damaged: "Dañado",
   suspended: "Suspendido",
 };
-
 
 export const statusMap = {
   paid: {
