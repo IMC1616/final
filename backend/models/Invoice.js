@@ -1,5 +1,5 @@
-const mongoose = require('mongoose')
-const mongooseDelete = require('mongoose-delete')
+const mongoose = require("mongoose");
+const mongooseDelete = require("mongoose-delete");
 
 const InvoiceSchema = new mongoose.Schema(
   {
@@ -14,7 +14,7 @@ const InvoiceSchema = new mongoose.Schema(
     },
     paymentStatus: {
       type: String,
-      enum: ['pending', 'paid'],
+      enum: ["pending", "paid"],
       required: true,
     },
     paymentDate: {
@@ -23,19 +23,23 @@ const InvoiceSchema = new mongoose.Schema(
     consumption: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      ref: 'Consumptions',
+      ref: "Consumptions",
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      ref: 'Users',
+      ref: "Users",
+    },
+    registeredBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Users",
     },
   },
   {
     timestamps: true,
     versionKey: false,
-  },
+  }
 );
 
-InvoiceSchema.plugin(mongooseDelete, { overrideMethods: 'all' })
-module.exports = mongoose.model('Invoices', InvoiceSchema)
+InvoiceSchema.plugin(mongooseDelete, { overrideMethods: "all" });
+module.exports = mongoose.model("Invoices", InvoiceSchema);

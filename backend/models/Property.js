@@ -1,5 +1,5 @@
-const mongoose = require('mongoose')
-const mongooseDelete = require('mongoose-delete')
+const mongoose = require("mongoose");
+const mongooseDelete = require("mongoose-delete");
 
 const PropertyScheme = new mongoose.Schema(
   {
@@ -22,14 +22,18 @@ const PropertyScheme = new mongoose.Schema(
     user: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      ref: 'Users',
+      ref: "Users",
+    },
+    registeredBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Users",
     },
   },
   {
     timestamps: true,
     versionKey: false,
-  },
-)
+  }
+);
 
-PropertyScheme.plugin(mongooseDelete, { overrideMethods: 'all' })
-module.exports = mongoose.model('Properties', PropertyScheme)
+PropertyScheme.plugin(mongooseDelete, { overrideMethods: "all" });
+module.exports = mongoose.model("Properties", PropertyScheme);

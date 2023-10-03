@@ -67,7 +67,7 @@ const getInvoicesByMeter = async (req, res) => {
 const getInvoiceById = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log("🚀 ~ file: invoices.js:70 ~ getInvoiceById ~ id:", id)
+    console.log("🚀 ~ file: invoices.js:70 ~ getInvoiceById ~ id:", id);
 
     const invoice = await Invoice.findById(id)
       .populate({
@@ -109,6 +109,7 @@ const payInvoice = async (req, res) => {
     }
     invoice.paymentStatus = "paid";
     invoice.paymentDate = new Date();
+    invoice.registeredBy = req.user._id;
 
     await invoice.save();
 

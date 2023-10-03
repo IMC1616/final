@@ -30,7 +30,7 @@ const UserScheme = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["customer", "reader", "admin"],
+      enum: ["customer", "reader", "manifold", "admin"], // NOTE: manifold recently added
       default: "customer",
     },
     resetPasswordToken: {

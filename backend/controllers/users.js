@@ -112,15 +112,15 @@ const getUserDebts = async (req, res) => {
         user: userId,
         invoiceDate: {
           $gte: new Date(startDate),
-          $lte: new Date(endDate)
+          $lte: new Date(endDate),
         },
-        paymentStatus: 'pending'
-      }).populate('user');
+        paymentStatus: "pending",
+      }).populate("user");
     } else {
       unpaidInvoices = await Invoice.find({
         user: userId,
-        paymentStatus: 'pending'
-      }).populate('user');
+        paymentStatus: "pending",
+      }).populate("user");
     }
 
     const userDebts = unpaidInvoices.reduce((acc, invoice) => {
@@ -128,7 +128,7 @@ const getUserDebts = async (req, res) => {
         acc = {
           userInfo: invoice.user,
           totalDebt: 0,
-          monthlyDetails: {}
+          monthlyDetails: {},
         };
       }
 
@@ -146,19 +146,20 @@ const getUserDebts = async (req, res) => {
     if (!userDebts) {
       return res.status(404).json({
         success: false,
-        message: 'No se encontraron facturas impagas para el usuario especificado'
+        message:
+          "No se encontraron facturas impagas para el usuario especificado",
       });
     }
 
     res.status(200).json({
       success: true,
-      data: userDebts
+      data: userDebts,
     });
   } catch (err) {
     console.error(err);
     res.status(500).json({
       success: false,
-      message: 'Hubo un error al obtener los informes de impagos'
+      message: "Hubo un error al obtener los informes de impagos",
     });
   }
 };
@@ -222,6 +223,7 @@ const createUser = async (req, res) => {
       phone,
       role,
       password: await encrypt(password),
+      registeredBy: req.user._id,
     });
 
     const user = await newUser.save();
@@ -242,7 +244,11 @@ const updateUser = async (req, res) => {
     const { id } = req.params;
     const updateFields = matchedData(req);
 
-    const user = await User.findByIdAndUpdate(id, updateFields, { new: true });
+    const user = await User.findByIdAndUpdate(
+      id,
+      { ...updateFields, registeredBy: req.user._id },
+      { new: true }
+    );
 
     res.status(200).json({
       success: true,

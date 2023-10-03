@@ -193,6 +193,7 @@ const createCustomer = async (req, res) => {
       phone,
       role: "customer",
       password: await encrypt(password),
+      registeredBy: req.user._id,
     });
 
     const customer = await newUser.save();
@@ -213,9 +214,13 @@ const updateCustomer = async (req, res) => {
     const { id } = req.params;
     const updateFields = matchedData(req);
 
-    const customer = await User.findByIdAndUpdate(id, updateFields, {
-      new: true,
-    });
+    const customer = await User.findByIdAndUpdate(
+      id,
+      { ...updateFields, registeredBy: req.user._id },
+      {
+        new: true,
+      }
+    );
 
     res.status(200).json({
       success: true,

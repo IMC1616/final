@@ -67,7 +67,7 @@ const getPropertyMeters = async (req, res) => {
         .json({ success: false, message: "No se encontró la propiedad." });
     }
 
-    const meters = await Meter.find({ property: id }).populate('category');
+    const meters = await Meter.find({ property: id }).populate("category");
     return res.status(200).json({ success: true, data: meters });
   } catch (err) {
     handleHttpError(res, "ERROR_GET_PROPERTY_METERS");
@@ -90,6 +90,7 @@ const createProperty = async (req, res) => {
       latitude,
       longitude,
       user,
+      registeredBy: req.user._id,
     });
 
     const property = await newProperty.save();
@@ -108,9 +109,13 @@ const updateProperty = async (req, res) => {
     const { id } = req.params;
     const updateFields = matchedData(req);
 
-    const property = await Property.findByIdAndUpdate(id, updateFields, {
-      new: true,
-    });
+    const property = await Property.findByIdAndUpdate(
+      id,
+      { ...updateFields, registeredBy: req.user._id },
+      {
+        new: true,
+      }
+    );
 
     res.status(200).json({
       success: true,

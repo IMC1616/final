@@ -101,7 +101,9 @@ const getMeterConsumptions = async (req, res) => {
         .json({ success: false, message: "No se encontró la propiedad." });
     }
 
-    const consumptions = await Consumption.find({ meter: id }).sort({ readingDate: -1 });
+    const consumptions = await Consumption.find({ meter: id }).sort({
+      readingDate: -1,
+    });
     return res.status(200).json({ success: true, data: consumptions });
   } catch (err) {
     handleHttpError(res, "ERROR_GET_PROPERTY_METERS");
@@ -128,6 +130,7 @@ const createMeter = async (req, res) => {
       status,
       property,
       category,
+      registeredBy: req.user._id,
     });
 
     const meter = await newMeter.save();
@@ -146,9 +149,13 @@ const updateMeter = async (req, res) => {
     const { id } = req.params;
     const updateFields = matchedData(req);
 
-    const meter = await Meter.findByIdAndUpdate(id, updateFields, {
-      new: true,
-    });
+    const meter = await Meter.findByIdAndUpdate(
+      id,
+      { ...updateFields, registeredBy: req.user._id },
+      {
+        new: true,
+      }
+    );
 
     res.status(200).json({
       success: true,

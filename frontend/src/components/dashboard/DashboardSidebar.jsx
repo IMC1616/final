@@ -5,10 +5,8 @@ import { Avatar, Box, Divider, Drawer, Typography } from "@mui/material";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import ChartSquareBarIcon from "../../icons/ChartSquareBar";
-import UserIcon from "../../icons/User";
 import UsersIcon from "../../icons/Users";
 import ManageAccountIcon from "../../icons/ManageAccount";
-import MeterIcon from "../../icons/Meter";
 import CategoryIcon from "../../icons/Category";
 import Logo from "../Logo";
 import NavSection from "../NavSection";
@@ -54,7 +52,7 @@ const DashboardSidebar = (props) => {
         //   icon: <UserIcon fontSize="small" />,
         // },
       ],
-      roles: ["customer", "reader", "admin"],
+      roles: ["customer", "reader", "manifold", "admin"],
     },
     {
       title: "Administración",
@@ -69,14 +67,8 @@ const DashboardSidebar = (props) => {
           title: "Cobranzas",
           path: "/dashboard/invoices",
           icon: <ReceiptLongIcon fontSize="small" />,
-          roles: ["reader", "admin"],
+          roles: ["manifold", "admin"],
         },
-        // {
-        //   title: "Medidores",
-        //   path: "/dashboard/meters",
-        //   icon: <MeterIcon fontSize="small" />,
-        //   roles: ["admin"],
-        // },
         {
           title: "Categorias",
           path: "/dashboard/categories",
@@ -90,7 +82,7 @@ const DashboardSidebar = (props) => {
           roles: ["admin"],
         },
       ],
-      roles: ["reader", "admin"],
+      roles: ["reader", "manifold", "admin"],
     },
   ];
 

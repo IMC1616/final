@@ -72,46 +72,48 @@ const CustomerOverview = () => {
         >{`Teléfono: ${customer?.phone}`}</Typography>
 
         <Grid container spacing={1} marginTop={1}>
-          <Grid item xs={12} sm={4}>
-            <Card sx={{ backgroundColor: "background.paper" }}>
-              <CardContent>
-                <Box
-                  display="flex"
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <Typography variant="h6">Propiedades</Typography>
-                  <Guard item roles={["admin"]}>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={() => {
-                        dispatch(
-                          openModal({
-                            component: "property",
-                            type: "create",
-                          })
-                        );
-                      }}
-                    >
-                      Agregar
-                    </Button>
-                  </Guard>
-                </Box>
-                <CustomerProperties customerId={params.customerId} />
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <Card sx={{ backgroundColor: "background.paper" }}>
-              <CardContent>
-                <Box
-                  display="flex"
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <Typography variant="h6">Medidores</Typography>
-                  <Guard item roles={["admin"]}>
+          <Guard item roles={["admin"]}>
+            <Grid item xs={12} sm={4}>
+              <Card sx={{ backgroundColor: "background.paper" }}>
+                <CardContent>
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
+                    <Typography variant="h6">Propiedades</Typography>
+                    <Guard item roles={["admin"]}>
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={() => {
+                          dispatch(
+                            openModal({
+                              component: "property",
+                              type: "create",
+                            })
+                          );
+                        }}
+                      >
+                        Agregar
+                      </Button>
+                    </Guard>
+                  </Box>
+                  <CustomerProperties customerId={params.customerId} />
+                </CardContent>
+              </Card>
+            </Grid>
+          </Guard>
+          <Guard item roles={["admin"]}>
+            <Grid item xs={12} sm={4}>
+              <Card sx={{ backgroundColor: "background.paper" }}>
+                <CardContent>
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
+                    <Typography variant="h6">Medidores</Typography>
                     <Button
                       variant="contained"
                       color="primary"
@@ -126,44 +128,46 @@ const CustomerOverview = () => {
                     >
                       Agregar
                     </Button>
-                  </Guard>
-                </Box>
-                {selectedProperty && (
-                  <CustomerMeters propertyId={selectedProperty} />
-                )}
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <Card sx={{ backgroundColor: "background.paper" }}>
-              <CardContent>
-                <Box
-                  display="flex"
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <Typography variant="h6">Consumos</Typography>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => {
-                      dispatch(
-                        openModal({
-                          component: "consumption",
-                          type: "create",
-                        })
-                      );
-                    }}
+                  </Box>
+                  {selectedProperty && (
+                    <CustomerMeters propertyId={selectedProperty} />
+                  )}
+                </CardContent>
+              </Card>
+            </Grid>
+          </Guard>
+          <Guard item roles={["admin", "reader"]}>
+            <Grid item xs={12} sm={4}>
+              <Card sx={{ backgroundColor: "background.paper" }}>
+                <CardContent>
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
                   >
-                    Agregar
-                  </Button>
-                </Box>
-                {selectedMeter && (
-                  <CustomerConsumptions meterId={selectedMeter} />
-                )}
-              </CardContent>
-            </Card>
-          </Grid>
+                    <Typography variant="h6">Consumos</Typography>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => {
+                        dispatch(
+                          openModal({
+                            component: "consumption",
+                            type: "create",
+                          })
+                        );
+                      }}
+                    >
+                      Agregar
+                    </Button>
+                  </Box>
+                  {selectedMeter && (
+                    <CustomerConsumptions meterId={selectedMeter} />
+                  )}
+                </CardContent>
+              </Card>
+            </Grid>
+          </Guard>
         </Grid>
       </Container>
     </Box>

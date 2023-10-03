@@ -1,5 +1,5 @@
-const mongoose = require('mongoose')
-const mongooseDelete = require('mongoose-delete')
+const mongoose = require("mongoose");
+const mongooseDelete = require("mongoose-delete");
 
 const MeterScheme = new mongoose.Schema(
   {
@@ -16,19 +16,23 @@ const MeterScheme = new mongoose.Schema(
     property: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      ref: 'Properties',
+      ref: "Properties",
     },
     category: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
-      ref: 'Categories',
+      ref: "Categories",
+    },
+    registeredBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Users",
     },
   },
   {
     timestamps: true,
     versionKey: false,
-  },
-)
+  }
+);
 
-MeterScheme.plugin(mongooseDelete, { overrideMethods: 'all' })
-module.exports = mongoose.model('Meters', MeterScheme)
+MeterScheme.plugin(mongooseDelete, { overrideMethods: "all" });
+module.exports = mongoose.model("Meters", MeterScheme);

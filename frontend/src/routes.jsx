@@ -52,7 +52,7 @@ const routes = [
   {
     path: "dashboard",
     element: (
-      <RoleBaseGuard roles={["customer", "reader", "admin"]}>
+      <RoleBaseGuard roles={["customer", "reader", "manifold", "admin"]}>
         <DashboardLayout />
       </RoleBaseGuard>
     ),
@@ -64,11 +64,19 @@ const routes = [
         children: [
           {
             index: true,
-            element: <Customers />, // TODO: Add guard to this route
+            element: (
+              <RoleBaseGuard roles={["reader", "admin"]}>
+                <Customers />
+              </RoleBaseGuard>
+            ),
           },
           {
             path: ":customerId",
-            element: <CustomerOverview />, // TODO: Add guard to this route
+            element: (
+              <RoleBaseGuard roles={["reader", "admin"]}>
+                <CustomerOverview />
+              </RoleBaseGuard>
+            ),
           },
         ],
       },
@@ -77,17 +85,46 @@ const routes = [
         children: [
           {
             index: true,
-            element: <Invoices />,
+            element: (
+              <RoleBaseGuard roles={["admin", "manifold"]}>
+                <Invoices />
+              </RoleBaseGuard>
+            ),
           },
           {
             path: ":invoiceId",
-            element: <InvoiceOverview />, // TODO: Add guard to this route
+            element: (
+              <RoleBaseGuard roles={["admin", "manifold"]}>
+                <InvoiceOverview />
+              </RoleBaseGuard>
+            ),
           },
         ],
       },
-      { path: "categories", element: <Categories /> },
-      { path: "meters", element: <Meters /> },
-      { path: "users", element: <Users /> },
+      {
+        path: "categories",
+        element: (
+          <RoleBaseGuard roles={["admin"]}>
+            <Categories />
+          </RoleBaseGuard>
+        ),
+      },
+      {
+        path: "meters",
+        element: (
+          <RoleBaseGuard roles={["admin", "reader"]}>
+            <Meters />
+          </RoleBaseGuard>
+        ),
+      },
+      {
+        path: "users",
+        element: (
+          <RoleBaseGuard roles={["admin"]}>
+            <Users />
+          </RoleBaseGuard>
+        ),
+      },
     ],
   },
   {

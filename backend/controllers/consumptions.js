@@ -117,6 +117,7 @@ const createConsumption = async (req, res) => {
       currentReading,
       consumptionCubicMeters,
       meter,
+      registeredBy: req.user._id,
     });
 
     const consumption = await newConsumption.save();
@@ -126,20 +127,26 @@ const createConsumption = async (req, res) => {
       data: consumption,
     });
   } catch (error) {
-    console.log("🚀 ~ file: consumptions.js:127 ~ createConsumption ~ error:", error)
+    console.log(
+      "🚀 ~ file: consumptions.js:127 ~ createConsumption ~ error:",
+      error
+    );
     handleHttpError(res, "ERROR_CREATE_CONSUMPTION");
   }
 };
-
 
 const updateConsumption = async (req, res) => {
   try {
     const { id } = req.params;
     const updateFields = matchedData(req);
 
-    const consumption = await Consumption.findByIdAndUpdate(id, updateFields, {
-      new: true,
-    });
+    const consumption = await Consumption.findByIdAndUpdate(
+      id,
+      { ...updateFields, registeredBy: req.user._id },
+      {
+        new: true,
+      }
+    );
 
     res.status(200).json({
       success: true,

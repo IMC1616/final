@@ -2,14 +2,12 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link as RouterLink } from "react-router-dom";
 import {
-  Box,
   Button,
   Card,
   CardActionArea,
   CardContent,
   CardActions,
   Typography,
-  CircularProgress,
   Grid,
 } from "@mui/material";
 import CustomerFilter from "./CustomerFilter";
