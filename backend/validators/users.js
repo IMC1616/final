@@ -29,7 +29,7 @@ const createUserValidator = [
   check("password").optional().notEmpty().isLength({ min: 6, max: 100 }),
   check("mobile").optional().isString().isLength({ min: 10, max: 15 }),
   check("phone").optional().isString().isLength({ min: 10, max: 15 }),
-  check("role").exists().isIn(["user", "reader", "admin"]),
+  check("role").exists().isIn(["customer", "manifold", "reader", "admin"]),
   (req, res, next) => {
     return validateResults(req, res, next);
   },
@@ -37,13 +37,13 @@ const createUserValidator = [
 
 const updateUserValidator = [
   param("id").isMongoId().withMessage("Invalid user ID."),
-  check("name").optional().notEmpty().isLength({ min: 3, max: 99 }),
-  check("lastName").optional().notEmpty().isLength({ min: 3, max: 99 }),
-  check("email").optional().notEmpty().isEmail(),
-  check("ci").exists().notEmpty(),
+  check("name").optional().isLength({ min: 3, max: 99 }),
+  check("lastName").optional().isLength({ min: 3, max: 99 }),
+  check("email").optional().isEmail(),
+  check("ci").optional(),
   check("mobile").optional().isString(),
   check("phone").optional().isString(),
-  check("role").optional().isIn(["user", "reader", "admin"]),
+  check("role").optional().isIn(["customer", "manifold", "reader", "admin"]),
   (req, res, next) => {
     return validateResults(req, res, next);
   },
@@ -55,7 +55,6 @@ const deleteUserValidator = [
     return validateResults(req, res, next);
   },
 ];
-
 
 const getUserDebtsValidator = [
   query("startDate")

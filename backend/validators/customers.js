@@ -28,7 +28,7 @@ const createCustomerValidator = [
   check("lastName").exists().notEmpty().isLength({ min: 3, max: 99 }),
   check("email").exists().notEmpty().isEmail(),
   check("ci").exists().notEmpty(),
-  check("password").optional().notEmpty().isLength({ min: 6, max: 100 }),
+  check("password").optional().isLength({ min: 6, max: 100 }),
   check("mobile").optional().isString().isLength({ min: 10, max: 15 }),
   check("phone").optional().isString().isLength({ min: 10, max: 15 }),
   (req, res, next) => {

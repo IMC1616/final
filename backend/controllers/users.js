@@ -206,13 +206,18 @@ const createUser = async (req, res) => {
   try {
     const { name, lastName, ci, email, mobile, phone, role } = matchedData(req);
 
-    const userExists = await User.findOne({ email });
+    const userExists = await User.findOne({ $or: [{ email }, { ci }] });
+    console.log(
+      "🚀 ~ file: users.js:217 ~ createUser ~ userExists:",
+      userExists
+    );
 
     if (userExists) {
       return handleHttpError(res, "USER_ALREADY_EXISTS", 400);
     }
 
     const password = generatePassword();
+    console.log("🚀 ~ file: users.js:216 ~ createUser ~ password:", password);
 
     const newUser = new User({
       name,
@@ -225,7 +230,8 @@ const createUser = async (req, res) => {
       password: await encrypt(password),
       registeredBy: req.user._id,
     });
-
+    console.log("🚀 ~ file: users.js:229 ~ createUser ~ newUser:", newUser);
+    // password: VwZLxrQ
     const user = await newUser.save();
 
     sendEmail(user.email, "Your Password", `Your password is: ${password}`);
@@ -235,6 +241,7 @@ const createUser = async (req, res) => {
       data: user,
     });
   } catch (error) {
+    console.log("🚀 ~ file: users.js:239 ~ createUser ~ error:", error);
     handleHttpError(res, "ERROR_CREATE_USER");
   }
 };

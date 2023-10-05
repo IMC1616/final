@@ -75,6 +75,7 @@ const UserModal = ({ isOpen, handleClose }) => {
           _id: data?._id,
           name: data?.name,
           lastName: data?.lastName,
+          ci: data?.ci,
           email: data?.email,
           phone: data?.phone,
           role: data?.role || "admin",
@@ -94,6 +95,7 @@ const UserModal = ({ isOpen, handleClose }) => {
               /^(?=.{3,100}$)[a-zA-Z ]*$/,
               "Mínimo 3 caracteres, máximo 100. Solo letras."
             ),
+          ci: Yup.string().required("Debe ingresar el Carnet de Identidad"),
           email: Yup.string()
             .max(255)
             .email("Debe ser un correo electrónico válido")
@@ -150,7 +152,7 @@ const UserModal = ({ isOpen, handleClose }) => {
                       variant="outlined"
                     />
                   </Grid>
-                  <Grid item lg={12} md={12} sm={12} xs={12}>
+                  <Grid item lg={7} md={7} sm={7} xs={12}>
                     <TextField
                       error={Boolean(touched.email && errors.email)}
                       fullWidth
@@ -161,6 +163,20 @@ const UserModal = ({ isOpen, handleClose }) => {
                       onChange={handleChange}
                       required
                       value={values.email}
+                      variant="outlined"
+                    />
+                  </Grid>
+                  <Grid item lg={5} md={5} sm={5} xs={12}>
+                    <TextField
+                      error={Boolean(touched.ci && errors.ci)}
+                      fullWidth
+                      helperText={touched.ci && errors.ci}
+                      label="Carnet de Identidad"
+                      name="ci"
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      required
+                      value={values.ci}
                       variant="outlined"
                     />
                   </Grid>
