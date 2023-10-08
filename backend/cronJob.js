@@ -132,3 +132,5 @@ cron.schedule("0 0 10 * *", () => {
   console.log("Ejecutando cron-job para crear facturas y notificaciones.");
   createInvoicesAndNotifications();
 });
+
+module.exports = { createInvoicesAndNotifications };

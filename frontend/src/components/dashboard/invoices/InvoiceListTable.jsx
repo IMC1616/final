@@ -216,7 +216,12 @@ export const InvoiceListTable = ({ ...other }) => {
     isSuccess: isSuccessInvoices,
     data: fetchedDataInvoices,
     isError: isErrorInvoices,
+    error: errorInvoices,
   } = useGetInvoicesQuery(queryString);
+  console.log(
+    "🚀 ~ file: InvoiceListTable.jsx:221 ~ InvoiceListTable ~ errorInvoices:",
+    errorInvoices
+  );
 
   useEffect(() => {
     if (isSuccessInvoices) {
@@ -245,7 +250,17 @@ export const InvoiceListTable = ({ ...other }) => {
 
   let content;
 
-  if (group) {
+  if (isErrorInvoices) {
+    return <Typography color="error">{errorInvoices.data.message}</Typography>;
+  }
+
+  if (isLoadingInvoices || isFetchingInvoices) {
+    content = <div>Error al cargar los datos</div>;
+  }
+
+  if (isSuccessInvoices && invoices.length === 0) {
+    content = <Typography>No se encontraron facturas.</Typography>;
+  } else if (group) {
     const groupedInvoices = groupInvoices(invoices);
     const statuses = Object.keys(groupedInvoices);
 

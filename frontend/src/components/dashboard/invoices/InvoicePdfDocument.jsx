@@ -140,6 +140,10 @@ export const InvoicePdfDocument = ({ invoice }) => {
           </View>
         </View>
 
+        <View style={{ alignItems: "center", marginTop: 20 }}>
+          <Text style={[styles.h4, styles.uppercase]}>RECIBO</Text>
+        </View>
+
         <View>
           <View style={styles.references}>
             <View>
@@ -231,6 +235,20 @@ export const InvoicePdfDocument = ({ invoice }) => {
               </Text>
             </View>
           </View>
+        </View>
+        <View>
+          <View
+            style={{
+              marginTop: 100,
+              marginBottom: 10,
+              width: "30%",
+              borderBottomWidth: 1,
+              borderColor: "#000",
+            }}
+          />
+          <Text style={{ ...styles.h6, marginLeft: "50px" }}>
+            Sello de Caja
+          </Text>
         </View>
       </Page>
     </Document>

@@ -5,10 +5,12 @@ const invoicesEndpoint = apiSlice.injectEndpoints({
     getInvoices: build.query({
       query: (url) => url,
       providesTags: (result) => [
-        ...result?.data?.invoices.map((invoice) => ({
-          type: "Invoice",
-          id: invoice._id,
-        })),
+        ...(Array.isArray(result?.data?.invoices)
+          ? result.data.invoices.map((invoice) => ({
+              type: "Invoice",
+              id: invoice._id,
+            }))
+          : []),
         { type: "Invoice", id: "LIST" },
       ],
     }),

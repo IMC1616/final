@@ -5,10 +5,6 @@ export const THEMES = {
 
 export const roles = [
   {
-    label: "Socio",
-    value: "customer",
-  },
-  {
     label: "Lector",
     value: "reader",
   },

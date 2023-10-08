@@ -43,7 +43,7 @@ const InvoicePreview = ({ invoice, ...other }) => {
               width: 24,
             }}
           >
-            <Logo />
+            <img src="/logo.png" alt="logo" />
           </Box>
         </div>
         <div>
@@ -55,6 +55,12 @@ const InvoicePreview = ({ invoice, ...other }) => {
           </Typography>
         </div>
       </Stack>
+      <Box sx={{ mt: 4, display: "flex", justifyContent: "center" }}>
+        <Typography variant="h3" style={{ textTransform: "uppercase" }}>
+          RECIBO
+        </Typography>
+      </Box>
+
       <Box sx={{ mt: 4 }}>
         <Grid container justifyContent="space-between">
           <Grid xs={12} md={4}>
@@ -131,6 +137,20 @@ const InvoicePreview = ({ invoice, ...other }) => {
             </TableRow>
           </TableBody>
         </Table>
+      </Box>
+      <Box sx={{ mt: 4 }}>
+        <Box
+          sx={{
+            marginTop: 10,
+            marginBottom: 1,
+            width: "30%",
+            borderBottom: 1,
+            borderColor: "grey.500",
+          }}
+        />
+        <Typography variant="h6" sx={{ marginLeft: 14 }}>
+          Sello de Caja
+        </Typography>
       </Box>
     </Card>
   );

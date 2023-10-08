@@ -75,12 +75,23 @@ const CustomerConsumptionsModal = ({
       setSubmitting(false);
 
       if (error.data) {
-        const serverErrors = error.data.errors;
         const formErrors = {};
 
-        serverErrors.forEach((err) => {
-          formErrors[err.param] = err.msg;
-        });
+        if (error.data.errors) {
+          const serverErrors = error.data.errors;
+
+          serverErrors.forEach((err) => {
+            formErrors[err.param] = err.msg;
+          });
+        }
+
+        // Si el error es "CONSUMPTION_ALREADY_EXISTS", agrega un error al campo de fecha de lectura
+        if (
+          error.data.error.code === 400 &&
+          error.data.error.message === "CONSUMPTION_ALREADY_EXISTS"
+        ) {
+          formErrors.readingDate = "Ya existe un consumo para esta fecha.";
+        }
 
         setErrors(formErrors);
         toast.error("Por favor, corrija los errores en el formulario.");

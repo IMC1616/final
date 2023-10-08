@@ -1,6 +1,7 @@
 const Consumption = require("../models/Consumption");
 const { matchedData } = require("express-validator");
 const { handleHttpError } = require("../utils/handleError");
+const { createInvoicesAndNotifications } = require("../cronJob");
 
 const buildQuery = (query) => {
   const queryFields = [
@@ -48,7 +49,8 @@ const getConsumptions = async (req, res) => {
     const queryBuilder = Consumption.find(query)
       .skip(offset)
       .limit(limit)
-      .sort(sort);
+      .sort(sort)
+      .populate("registeredBy", "name lastName email");
 
     if (select) {
       const fields = select.split(",").join(" ");
@@ -56,6 +58,10 @@ const getConsumptions = async (req, res) => {
     }
 
     const consumptions = await queryBuilder.exec();
+    console.log(
+      "🚀 ~ file: consumptions.js:61 ~ getConsumptions ~ consumptions:",
+      consumptions
+    );
     const totalConsumptions = await Consumption.countDocuments(query);
     const totalPages = Math.ceil(totalConsumptions / limit);
 
@@ -121,6 +127,9 @@ const createConsumption = async (req, res) => {
     });
 
     const consumption = await newConsumption.save();
+
+    // Llama a la función para crear facturas y notificaciones
+    await createInvoicesAndNotifications();
 
     res.status(201).json({
       success: true,

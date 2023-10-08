@@ -23,6 +23,8 @@ const buildQuery = (query) => {
     }
   });
 
+  queryObj.role = { $ne: "customer" };
+
   return queryObj;
 };
 

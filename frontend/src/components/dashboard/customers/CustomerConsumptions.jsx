@@ -36,6 +36,10 @@ const CustomerConsumptions = ({ meterId }) => {
     data: meterConsumptionsData,
     error,
   } = useGetMeterConsumptionsQuery(meterId);
+  console.log(
+    "🚀 ~ file: CustomerConsumptions.jsx:39 ~ CustomerConsumptions ~ meterConsumptionsData:",
+    meterConsumptionsData
+  );
 
   const handleCloseModal = useCallback(() => {
     dispatch(closeModal());
@@ -68,6 +72,10 @@ const CustomerConsumptions = ({ meterId }) => {
                 </Typography>
                 <Typography variant="subtitle1">
                   Consumo (m³): {consumption.consumptionCubicMeters}
+                </Typography>
+                <Typography variant="subtitle1">
+                  Registradp por: {consumption?.registeredBy?.name}{" "}
+                  {consumption?.registeredBy?.lastName}
                 </Typography>
               </CardContent>
               <div

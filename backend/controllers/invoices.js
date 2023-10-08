@@ -67,7 +67,6 @@ const getInvoicesByMeter = async (req, res) => {
 const getInvoiceById = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log("🚀 ~ file: invoices.js:70 ~ getInvoiceById ~ id:", id);
 
     const invoice = await Invoice.findById(id)
       .populate({
