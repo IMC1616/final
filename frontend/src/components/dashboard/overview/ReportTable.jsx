@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from "react";
-import MaterialReactTable from "material-react-table";
+import { MaterialReactTable } from "material-react-table";
 import { MRT_Localization_ES } from "material-react-table/locales/es";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import {
