@@ -39,6 +39,11 @@ const CustomerOverview = Loadable(
 const Categories = Loadable(
   lazy(() => import("./pages/dashboard/categories/Categories"))
 );
+
+const Reconnections = Loadable(
+  lazy(() => import("./pages/dashboard/reconnections/Reconnections"))
+);
+
 const Users = Loadable(lazy(() => import("./pages/dashboard/users/Users")));
 
 // Error pages
@@ -106,6 +111,14 @@ const routes = [
         element: (
           <RoleBaseGuard roles={["admin"]}>
             <Categories />
+          </RoleBaseGuard>
+        ),
+      },
+      {
+        path: "reconnections",
+        element: (
+          <RoleBaseGuard roles={["admin"]}>
+            <Reconnections />
           </RoleBaseGuard>
         ),
       },

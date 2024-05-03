@@ -67,7 +67,10 @@ const getPropertyMeters = async (req, res) => {
         .json({ success: false, message: "No se encontró la propiedad." });
     }
 
-    const meters = await Meter.find({ property: id }).populate("category");
+    const meters = await Meter.find({ property: id })
+      .populate("category")
+      .populate("reconnection");
+    console.log("🚀 ~ getPropertyMeters ~ meters:", meters);
     return res.status(200).json({ success: true, data: meters });
   } catch (err) {
     handleHttpError(res, "ERROR_GET_PROPERTY_METERS");

@@ -4,7 +4,13 @@ const { matchedData } = require("express-validator");
 const { handleHttpError } = require("../utils/handleError");
 
 const buildMeterQuery = (query) => {
-  const queryFields = ["code", "status", "property", "category"];
+  const queryFields = [
+    "code",
+    "status",
+    "property",
+    "category",
+    "reconnection",
+  ];
   const queryObj = {};
 
   queryFields.forEach((field) => {
@@ -28,7 +34,7 @@ const getMeters = async (req, res) => {
       .skip(offset)
       .limit(limit)
       .sort(sort)
-      .populate(["category", "property"]);
+      .populate(["category", "property", "reconnection"]);
 
     if (select) {
       const fields = select.split(",").join(" ");
@@ -64,6 +70,10 @@ const getMeterByCode = async (req, res) => {
       {
         path: "property",
         select: "address",
+      },
+      {
+        path: "reconnection",
+        select: "name amount",
       },
     ]);
 
@@ -119,6 +129,7 @@ const createMeter = async (req, res) => {
       status,
       property,
       category,
+      reconnection,
     });
 
     if (meterExists) {
@@ -130,6 +141,7 @@ const createMeter = async (req, res) => {
       status,
       property,
       category,
+      reconnection,
       registeredBy: req.user._id,
     });
 

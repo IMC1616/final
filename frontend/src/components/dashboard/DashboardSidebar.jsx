@@ -76,6 +76,12 @@ const DashboardSidebar = (props) => {
           roles: ["admin"],
         },
         {
+          title: "Reconexiones",
+          path: "/dashboard/reconnections",
+          icon: <CategoryIcon fontSize="small" />,
+          roles: ["admin"],
+        },
+        {
           title: "Usuarios",
           path: "/dashboard/users",
           icon: <ManageAccountIcon fontSize="small" />,

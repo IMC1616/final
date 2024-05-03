@@ -30,7 +30,9 @@ const createMeterValidator = [
   check("status")
     .optional()
     .isIn(["active", "inactive", "damaged", "suspended"])
-    .withMessage("The status must be 'active', 'inactive', 'damaged', or 'suspended'"),
+    .withMessage(
+      "The status must be 'active', 'inactive', 'damaged', or 'suspended'"
+    ),
   check("property")
     .exists()
     .notEmpty()
@@ -41,6 +43,11 @@ const createMeterValidator = [
     .notEmpty()
     .isMongoId()
     .withMessage("The category must be a valid ID of Mongodb."),
+  check("reconnection")
+    .optional()
+    .notEmpty()
+    .isMongoId()
+    .withMessage("The reconnection must be a valid ID of Mongodb."),
   (req, res, next) => {
     return validateResults(req, res, next);
   },
@@ -56,7 +63,9 @@ const updateMeterValidator = [
   check("status")
     .optional()
     .isIn(["active", "inactive", "damaged", "suspended"])
-    .withMessage("The status must be 'active', 'inactive', 'damaged', or 'suspended'"),
+    .withMessage(
+      "The status must be 'active', 'inactive', 'damaged', or 'suspended'"
+    ),
   check("property")
     .optional()
     .notEmpty()
@@ -67,6 +76,11 @@ const updateMeterValidator = [
     .notEmpty()
     .isMongoId()
     .withMessage("The category must be a valid ID of Mongodb."),
+  check("reconnection")
+    .optional()
+    .notEmpty()
+    .isMongoId()
+    .withMessage("The reconnection must be a valid ID of Mongodb."),
   (req, res, next) => {
     return validateResults(req, res, next);
   },

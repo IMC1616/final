@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useParams } from "react-router";
 import { useSelector } from "react-redux";
 import * as Yup from "yup";
@@ -23,6 +23,7 @@ import {
 import { meterStatuses } from "../../../constants";
 import { selectSelectedProperty } from "../../../features/customers/customerSlice";
 import { useGetCategoriesQuery } from "../../../services/endpoints/categories";
+import { useGetReconnectionsQuery } from "../../../services/endpoints/reconnections";
 
 const CustomerMetersModal = ({ isOpen, handleClose }) => {
   const data = useSelector(selectModalData);
@@ -33,13 +34,10 @@ const CustomerMetersModal = ({ isOpen, handleClose }) => {
 
   const selectedProperty = useSelector(selectSelectedProperty);
 
-  const {
-    isLoading: isLoadingCategories,
-    isFetching: isFetchingCategories,
-    isSuccess: isSuccessCategories,
-    data: fetchedDataCategories,
-    isError: isErrorCategories,
-  } = useGetCategoriesQuery("/categories");
+  const { data: fetchedDataCategories } = useGetCategoriesQuery("/categories");
+
+  const { data: fetchedDataReconnections } =
+    useGetReconnectionsQuery("/reconnections");
 
   const handleSubmit = async (
     values,
@@ -90,6 +88,7 @@ const CustomerMetersModal = ({ isOpen, handleClose }) => {
           status: data?.status || "active",
           property: data?.property || selectedProperty,
           category: data?.category?._id || "",
+          reconnection: data?.reconnection?._id || "",
           submit: null,
         }}
         validationSchema={Yup.object().shape({
@@ -104,6 +103,7 @@ const CustomerMetersModal = ({ isOpen, handleClose }) => {
             .required("El estado es requerido"),
           property: Yup.string().required("La propiedad es requerida"),
           category: Yup.string().required("La categoría es requerida"),
+          reconnection: Yup.string().required("La reconexión es requerida"),
         })}
         onSubmit={handleSubmit}
       >
@@ -185,6 +185,38 @@ const CustomerMetersModal = ({ isOpen, handleClose }) => {
                               {category.pricePerCubicMeter
                                 ? `${category.pricePerCubicMeter} por m³`
                                 : `${category.fixedPrice} fijo`}
+                            </MenuItem>
+                          )
+                        )}
+                      </TextField>
+                    </Grid>
+                  )}
+
+                  {fetchedDataReconnections && (
+                    <Grid item lg={12} md={12} sm={12} xs={12}>
+                      <TextField
+                        select
+                        error={Boolean(
+                          touched.reconnection && errors.reconnection
+                        )}
+                        fullWidth
+                        helperText={touched.reconnection && errors.reconnection}
+                        label="Seleecione el tipo de reconexión"
+                        name="reconnection"
+                        onBlur={handleBlur}
+                        onChange={handleChange}
+                        required
+                        value={values.reconnection}
+                        variant="outlined"
+                      >
+                        {fetchedDataReconnections.data.reconnections.map(
+                          (reconnection) => (
+                            <MenuItem
+                              key={reconnection._id}
+                              value={reconnection._id}
+                            >
+                              {reconnection.name} - Precio:{" "}
+                              {reconnection.amount} Bs
                             </MenuItem>
                           )
                         )}

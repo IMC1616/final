@@ -23,6 +23,11 @@ const MeterScheme = new mongoose.Schema(
       required: true,
       ref: "Categories",
     },
+    reconnection: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "Reconnections",
+    },
     registeredBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Users",

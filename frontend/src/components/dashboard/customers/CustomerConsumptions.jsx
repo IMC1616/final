@@ -36,10 +36,6 @@ const CustomerConsumptions = ({ meterId }) => {
     data: meterConsumptionsData,
     error,
   } = useGetMeterConsumptionsQuery(meterId);
-  console.log(
-    "🚀 ~ file: CustomerConsumptions.jsx:39 ~ CustomerConsumptions ~ meterConsumptionsData:",
-    meterConsumptionsData
-  );
 
   const handleCloseModal = useCallback(() => {
     dispatch(closeModal());
