@@ -87,15 +87,23 @@ const InvoiceRow = ({ invoice, ...other }) => {
             whiteSpace: "nowrap",
           }}
         >
-          <Avatar sx={{ height: 42, width: 42 }}>
-            {getInitials(`${invoice.user.name} ${invoice.user.lastName}`)}
+          <Avatar
+            sx={{
+              height: 42,
+              width: 42,
+              bgcolor: invoice.invoiceType === "Reconnection" && "orange",
+            }}
+          >
+            {invoice.invoiceType === "Reconnection" ? "C/S" : "C"}
           </Avatar>
           <div>
             <Typography color="text.primary" variant="subtitle2">
               {invoice._id}
             </Typography>
             <Typography color="text.secondary" variant="body2">
-              {`${invoice.user.name} ${invoice.user.lastName}`}
+              {invoice.invoiceType === "Reconnection"
+                ? "Corte de servicio"
+                : "Consumo"}
             </Typography>
           </div>
         </Stack>
@@ -218,10 +226,6 @@ export const InvoiceListTable = ({ ...other }) => {
     isError: isErrorInvoices,
     error: errorInvoices,
   } = useGetInvoicesQuery(queryString);
-  console.log(
-    "🚀 ~ file: InvoiceListTable.jsx:221 ~ InvoiceListTable ~ errorInvoices:",
-    errorInvoices
-  );
 
   useEffect(() => {
     if (isSuccessInvoices) {

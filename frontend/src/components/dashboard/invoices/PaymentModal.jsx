@@ -23,8 +23,18 @@ const PaymentModal = ({ isOpen, handleClose }) => {
 
   const handlePayment = async () => {
     try {
-      const resultAction = await payInvoice(invoice._id).unwrap();
-      toast.success("Factura pagada con éxito!");
+      const invoiceType = invoice.invoiceType.toLowerCase();
+      console.log("🚀 ~ handlePayment ~ invoiceType:", invoiceType);
+
+      const resultAction = await payInvoice({
+        invoiceId: invoice._id,
+        invoiceType,
+      }).unwrap();
+      toast.success(
+        `Factura ${
+          invoice.invoiceType === "Reconnection" ? "de reconexión" : ""
+        } pagada con éxito!`
+      );
 
       handleClose();
 
@@ -37,14 +47,17 @@ const PaymentModal = ({ isOpen, handleClose }) => {
     }
   };
 
-  const invoiceDate = invoice?.invoiceDate ? parseISO(invoice?.invoiceDate) : new Date();
+  const invoiceDate = invoice?.invoiceDate
+    ? parseISO(invoice?.invoiceDate)
+    : new Date();
   const monthName = format(invoiceDate, "MMMM", { locale: es });
 
   return (
     <Dialog fullWidth maxWidth="md" open={isOpen} onClose={handleClose}>
       <Box sx={{ p: 3 }}>
         <DialogTitle id="payment-dialog-title">
-          Factura ID: {invoice?._id}
+          Factura ID: {invoice?._id} - Tipo:{" "}
+          {invoice?.invoiceType === "Reconnection" ? "Reconexión" : "Regular"}
         </DialogTitle>
         <Divider />
         <Box
@@ -61,8 +74,13 @@ const PaymentModal = ({ isOpen, handleClose }) => {
             component="div"
             sx={{ fontWeight: "bold", mt: 2, mb: 3 }}
           >
-            Monto a pagar: {invoice?.totalAmount.toFixed(2)} Bs por el mes de{" "}
-            {monthName}. ¿Estás seguro de hacer el cobro?
+            {invoice?.invoiceType === "Reconnection"
+              ? `Monto de reconexión: ${invoice?.totalAmount.toFixed(
+                  2
+                )} Bs. ¿Confirmar pago de reconexión?`
+              : `Monto a pagar: ${invoice?.totalAmount.toFixed(
+                  2
+                )} Bs por el mes de ${monthName}. ¿Estás seguro de hacer el cobro?`}
           </Typography>
           <Box sx={{ display: "flex", width: "100%" }}>
             <Box sx={{ flexGrow: 1 }}>
@@ -84,7 +102,9 @@ const PaymentModal = ({ isOpen, handleClose }) => {
                 onClick={handlePayment}
                 sx={{ width: "100%" }}
               >
-                Cobrar
+                {invoice?.invoiceType === "Reconnection"
+                  ? "Confirmar"
+                  : "Cobrar"}
               </Button>
             </Box>
           </Box>

@@ -21,7 +21,7 @@ const getIncomesValidator = [
   },
 ];
 
-const getUnpaidValidator = [
+const getDatesValidator = [
   query("startDate")
     .isISO8601()
     .withMessage(
@@ -37,8 +37,7 @@ const getUnpaidValidator = [
   },
 ];
 
-
 module.exports = {
   getIncomesValidator,
-  getUnpaidValidator,
+  getDatesValidator,
 };

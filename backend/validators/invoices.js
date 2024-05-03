@@ -37,7 +37,17 @@ const invoiceIdValidator = [
   },
 ];
 
+const invoiceTypeValidator = [
+  param("invoiceType")
+    .isIn(["regular", "reconnection"])
+    .withMessage("Invalid invoice type."),
+  (req, res, next) => {
+    return validateResults(req, res, next);
+  },
+];
+
 module.exports = {
   getInvoicesByMeterValidator,
   invoiceIdValidator,
+  invoiceTypeValidator,
 };

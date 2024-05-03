@@ -21,11 +21,14 @@ const invoicesEndpoint = apiSlice.injectEndpoints({
       ],
     }),
     payInvoice: build.mutation({
-      query: (invoiceId) => ({
-        url: `invoices/${invoiceId}/pay`,
-        method: "PUT",
-      }),
-      invalidatesTags: (result, error, invoiceId) => [
+      query: ({ invoiceId, invoiceType }) => {
+        console.log(`URL: invoices/${invoiceId}/${invoiceType}/pay`); // Debugging the URL formation
+        return {
+          url: `invoices/${invoiceId}/${invoiceType}/pay`,
+          method: "PUT",
+        };
+      },
+      invalidatesTags: (result, error, { invoiceId }) => [
         { type: "Invoice", id: invoiceId },
         { type: "Report", id: "Unpaid" },
         { type: "Report", id: "Summary" },

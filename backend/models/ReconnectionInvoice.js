@@ -24,11 +24,6 @@ const ReconnectionInvoiceSchema = new mongoose.Schema(
       required: true,
       ref: "Meters",
     },
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: "Users",
-    },
   },
   {
     timestamps: true,

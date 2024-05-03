@@ -115,7 +115,8 @@ const useStyles = () => {
 export const InvoicePdfDocument = ({ invoice }) => {
   const styles = useStyles();
 
-  const { user, consumption, totalAmount, paymentStatus } = invoice;
+  const { user, meter, consumption, totalAmount, paymentStatus, invoiceType } =
+    invoice;
 
   const monthName = format(parseISO(invoice.invoiceDate), "MMMM", {
     locale: es,
@@ -130,18 +131,18 @@ export const InvoicePdfDocument = ({ invoice }) => {
         <View style={styles.header}>
           <View>
             <Image source="/logo.png" style={styles.brand} />
-            <Text style={styles.h6}>DROP</Text>
           </View>
           <View>
             <Text style={[styles.h4, styles.uppercase, styles.colorSuccess]}>
               {statusMap[paymentStatus].label}
             </Text>
-            <Text style={styles.subtitle2}>{invoice._id}</Text>
+            <Text style={styles.subtitle2}>Factura ID: {invoice._id}</Text>
+            <Text style={styles.subtitle2}>{paymentDateFormat}</Text>
           </View>
         </View>
 
         <View style={{ alignItems: "center", marginTop: 20 }}>
-          <Text style={[styles.h4, styles.uppercase]}>RECIBO</Text>
+          {invoiceType === "Reconnection" ? "RECIBO DE RECONEXIÓN" : "RECIBO"}
         </View>
 
         <View>
@@ -149,31 +150,39 @@ export const InvoicePdfDocument = ({ invoice }) => {
             <View>
               <Text style={[styles.subtitle2, styles.gutterBottom]}>Socio</Text>
               <Text style={styles.body2}>
-                Nombre completo: {user.name} {user.lastName}
+                {user?.name} {user?.lastName}
               </Text>
-              <Text style={styles.body2}>NIT: {user.nit}</Text>
+              <Text style={styles.body2}>NIT/CI: {user.ci}</Text>
             </View>
-            <View>
-              <Text style={[styles.subtitle2, styles.gutterBottom]}>
-                Consumo
-              </Text>
-              <Text style={styles.body2}>
-                Fecha de lectura:{" "}
-                {format(new Date(consumption.readingDate), "dd/MM/yyyy")}
-              </Text>
-              <Text style={styles.body2}>
-                Consumo: {consumption.consumptionCubicMeters} m³
-              </Text>
-            </View>
-            <View>
-              <Text style={[styles.subtitle2, styles.gutterBottom]}>
-                Medidor
-              </Text>
-              <Text style={styles.body2}>Código: {consumption.meter.code}</Text>
-              <Text style={styles.body2}>
-                Categoría: {consumption.meter.category.name}
-              </Text>
-            </View>
+            {consumption && (
+              <>
+                <View>
+                  <Text style={[styles.subtitle2, styles.gutterBottom]}>
+                    Medidor
+                  </Text>
+                  <Text style={styles.body2}>
+                    Código: {consumption?.meter?.code}
+                  </Text>
+                  <Text style={styles.body2}>
+                    Categoría: {consumption?.meter?.category?.name}
+                  </Text>
+                </View>
+              </>
+            )}
+
+            {typeof meter === "object" && (
+              <>
+                <View>
+                  <Text style={[styles.subtitle2, styles.gutterBottom]}>
+                    Medidor
+                  </Text>
+                  <Text style={styles.body2}>Código: {meter?.code}</Text>
+                  <Text style={styles.body2}>
+                    Categoría: {meter?.category?.name}
+                  </Text>
+                </View>
+              </>
+            )}
           </View>
         </View>
 
@@ -185,9 +194,16 @@ export const InvoicePdfDocument = ({ invoice }) => {
             <View style={styles.itemDescription}>
               <Text style={styles.h6}>Descripción</Text>
             </View>
-            <View style={styles.itemDate}>
-              <Text style={styles.h6}>Fecha de pago</Text>
-            </View>
+            {invoiceType !== "Reconnection" && (
+              <>
+                <View style={styles.itemDate}>
+                  <Text style={styles.h6}>Consumo</Text>
+                </View>
+                <View style={styles.itemDate}>
+                  <Text style={styles.h6}>Tarifa</Text>
+                </View>
+              </>
+            )}
             <View style={styles.itemTotalAmount}>
               <Text style={[styles.h6, styles.alignRight]}>Total</Text>
             </View>
@@ -199,15 +215,28 @@ export const InvoicePdfDocument = ({ invoice }) => {
             </View>
             <View style={styles.itemDescription}>
               <Text style={styles.body2}>
-                Consumo de agua del mes de {monthName}
+                {invoiceType === "Reconnection"
+                  ? "Cargo por reconexión"
+                  : `Consumo de agua del mes de ${monthName}`}
               </Text>
             </View>
-            <View style={styles.itemDate}>
-              <Text style={styles.body2}>{paymentDateFormat}</Text>
-            </View>
+            {invoiceType !== "Reconnection" && (
+              <>
+                <View style={styles.itemDate}>
+                  <Text style={styles.body2}>
+                    {consumption?.consumptionCubicMeters} m³
+                  </Text>
+                </View>
+                <View style={styles.itemDate}>
+                  <Text style={styles.body2}>
+                    {consumption?.meter?.category?.fixedPrice ?? 0} Bs
+                  </Text>
+                </View>
+              </>
+            )}
             <View style={styles.itemTotalAmount}>
               <Text style={[styles.body2, styles.alignRight]}>
-                {totalAmountFormatted}
+                {totalAmountFormatted} Bs
               </Text>
             </View>
           </View>
@@ -219,7 +248,7 @@ export const InvoicePdfDocument = ({ invoice }) => {
             </View>
             <View style={styles.summaryValue}>
               <Text style={[styles.body2, styles.alignRight]}>
-                {totalAmountFormatted}
+                {totalAmountFormatted} Bs
               </Text>
             </View>
           </View>
@@ -231,11 +260,12 @@ export const InvoicePdfDocument = ({ invoice }) => {
             </View>
             <View style={styles.summaryValue}>
               <Text style={[styles.body2, styles.alignRight]}>
-                {totalAmountFormatted}
+                {totalAmountFormatted} Bs
               </Text>
             </View>
           </View>
         </View>
+
         <View>
           <View
             style={{

@@ -3,6 +3,7 @@ const invoiceController = require("../controllers/invoices");
 const {
   getInvoicesByMeterValidator,
   invoiceIdValidator,
+  invoiceTypeValidator,
 } = require("../validators/invoices");
 const isAuthenticated = require("../middlewares/isAuthenticated");
 const isAuthorized = require("../middlewares/isAuthorized");
@@ -26,8 +27,13 @@ router.get(
 );
 
 router.put(
-  "/:id/pay",
-  [invoiceIdValidator, isAuthenticated, isAuthorized(["reader", "admin"])],
+  "/:id/:invoiceType/pay/",
+  [
+    invoiceIdValidator,
+    invoiceTypeValidator,
+    isAuthenticated,
+    isAuthorized(["reader", "admin"]),
+  ],
   invoiceController.payInvoice
 );
 

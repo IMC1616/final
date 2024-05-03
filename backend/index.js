@@ -9,6 +9,6 @@ const server = new Server();
 
 // Requiere e inicia el cron job
 require("./cronJob");
-
+require("./reviewAllMetersAndSuspend");
 // Ejecutar el server
 server.execute();

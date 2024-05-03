@@ -2,9 +2,6 @@ const cron = require("node-cron");
 const Category = require("./models/Category");
 const Consumption = require("./models/Consumption");
 const Invoice = require("./models/Invoice");
-const Property = require("./models/Property");
-const User = require("./models/User");
-
 const Notification = require("./models/Notification");
 const sendEmail = require("./utils/sendEmail");
 
@@ -112,6 +109,7 @@ const createInvoicesAndNotifications = async () => {
         invoiceDate: consumption.readingDate,
         totalAmount,
         paymentStatus: "pending",
+        meter: consumption.meter._id,
         consumption: consumption._id,
         user: user._id,
       });
@@ -120,7 +118,7 @@ const createInvoicesAndNotifications = async () => {
       await newInvoice.save();
 
       // Enviar notificación al usuario.
-      sendNotification(user, consumption, newInvoice);
+      // sendNotification(user, consumption, newInvoice);
     }
   } catch (error) {
     console.error("Error al crear facturas y notificaciones:", error);
@@ -132,5 +130,7 @@ cron.schedule("0 0 10 * *", () => {
   console.log("Ejecutando cron-job para crear facturas y notificaciones.");
   createInvoicesAndNotifications();
 });
+
+// createInvoicesAndNotifications();
 
 module.exports = { createInvoicesAndNotifications };

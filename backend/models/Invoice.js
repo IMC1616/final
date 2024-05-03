@@ -20,6 +20,11 @@ const InvoiceSchema = new mongoose.Schema(
     paymentDate: {
       type: Date,
     },
+    meter: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "Meters",
+    },
     consumption: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,

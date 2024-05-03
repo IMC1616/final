@@ -1,11 +1,16 @@
 const Invoice = require("../models/Invoice");
-const Consumption = require("../models/Consumption");
-const Meter = require("../models/Meter");
-
+const ReconnectionInvoice = require("../models/ReconnectionInvoice");
 
 const getReport = async (req, res) => {
   try {
-    const { startDate, endDate, offset = 0, limit = 10, sort = 'invoiceDate', select = '' } = req.query;
+    const {
+      startDate,
+      endDate,
+      offset = 0,
+      limit = 10,
+      sort = "invoiceDate",
+      select = "",
+    } = req.query;
 
     if (!startDate || !endDate) {
       return res.status(400).json({
@@ -27,14 +32,14 @@ const getReport = async (req, res) => {
       .limit(parseInt(limit))
       .sort(sort)
       .populate({
-        path: 'user',
-        select: 'name lastName',
+        path: "user",
+        select: "name lastName",
       })
       .populate({
-        path: 'consumption',
+        path: "consumption",
         populate: {
-          path: 'meter',
-          select: 'code',
+          path: "meter",
+          select: "code",
         },
       });
 
@@ -47,7 +52,7 @@ const getReport = async (req, res) => {
     const totalRecords = await Invoice.countDocuments(query);
     const totalPages = Math.ceil(totalRecords / parseInt(limit));
 
-    const report = paidInvoices.map(invoice => ({
+    const report = paidInvoices.map((invoice) => ({
       invoiceId: invoice._id,
       meterCode: invoice.consumption ? invoice.consumption.meter.code : null,
       date: invoice.invoiceDate,
@@ -75,58 +80,6 @@ const getReport = async (req, res) => {
     });
   }
 };
-
-
-// const getReport = async (req, res) => {
-//   try {
-//     const { startDate, endDate } = req.query;
-    
-//     if (!startDate || !endDate) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Se requieren las fechas de inicio y fin",
-//       });
-//     }
-
-//     const paidInvoices = await Invoice.find({
-//       invoiceDate: {
-//         $gte: new Date(startDate),
-//         $lte: new Date(endDate),
-//       },
-//       paymentStatus: "paid",
-//     })
-//     .populate({
-//       path: 'user',
-//       select: 'name lastName',
-//     })
-//     .populate({
-//       path: 'consumption',
-//       populate: {
-//         path: 'meter',
-//         select: 'code',
-//       },
-//     });
-
-//     const report = paidInvoices.map(invoice => ({
-//       invoiceId: invoice._id,
-//       meterCode: invoice.consumption ? invoice.consumption.meter.code : null,
-//       date: invoice.invoiceDate,
-//       userName: `${invoice.user.name} ${invoice.user.lastName}`,
-//       amount: invoice.totalAmount,
-//     }));
-
-//     res.status(200).json({
-//       success: true,
-//       data: report,
-//     });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({
-//       success: false,
-//       message: "Hubo un error al obtener el reporte",
-//     });
-//   }
-// };
 
 const getIncomes = async (req, res) => {
   try {
@@ -255,9 +208,102 @@ const getSummary = async (req, res) => {
   }
 };
 
+const getDelinquentUsersReport = async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+
+    if (!startDate || !endDate) {
+      return res.status(400).json({
+        success: false,
+        message: "Start and end dates are required",
+      });
+    }
+
+    // Find all unpaid invoices within the given date range
+    const unpaidInvoices = await Invoice.find({
+      invoiceDate: { $gte: new Date(startDate), $lt: new Date(endDate) },
+      paymentStatus: "pending",
+    }).populate({
+      path: "user",
+      select: "name lastName",
+    });
+
+    // Find any related unpaid reconnection invoices
+    const reconnectionInvoices = await ReconnectionInvoice.find({
+      invoiceDate: { $gte: new Date(startDate), $lt: new Date(endDate) },
+      paymentStatus: "pending",
+    }).populate({
+      path: "meter",
+      populate: [
+        {
+          path: "property",
+          populate: {
+            path: "user",
+          },
+        },
+        {
+          path: "category", // Assuming 'category' is directly under 'meter' and doesn't need further nesting
+        },
+      ],
+    });
+
+    // Combine and reduce the data
+    // const combinedInvoices = [...unpaidInvoices, ...reconnectionInvoices];
+    const combinedInvoices = [
+      ...unpaidInvoices.map((invoice) => ({
+        ...invoice.toJSON(),
+        invoiceType: "Regular",
+      })),
+      ...reconnectionInvoices.map((invoice) => ({
+        ...invoice.toJSON(),
+        user: invoice.meter.property.user, // Flatten the structure
+        invoiceType: "Reconnection",
+      })),
+    ];
+
+    const userDebts = combinedInvoices.reduce((acc, invoice) => {
+      const userId = invoice.user._id.toString();
+      const month = invoice.invoiceDate.getMonth() + 1; // Month as string
+      const monthKey = `${month}`;
+      if (!acc[userId]) {
+        acc[userId] = {
+          name: `${invoice.user.name} ${invoice.user.lastName}`,
+          amounts: [],
+        };
+      }
+
+      // Add each invoice as a separate entry under amounts
+      acc[userId].amounts.push({
+        month: monthKey,
+        amount: invoice.totalAmount,
+        invoiceType: invoice.invoiceType,
+      });
+
+      return acc;
+    }, {});
+
+    const result = Object.values(userDebts).map((user) => ({
+      ...user,
+      amounts: user.amounts.sort((a, b) => a.month - b.month), // Sort by month for better readability
+    }));
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while obtaining the report",
+    });
+  }
+};
+
 module.exports = {
   getReport,
   getIncomes,
   getUnpaid,
   getSummary,
+  getDelinquentUsersReport,
 };

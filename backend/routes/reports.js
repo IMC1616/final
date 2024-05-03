@@ -2,7 +2,7 @@ const express = require("express");
 const reportController = require("../controllers/reports");
 const {
   getIncomesValidator,
-  getUnpaidValidator,
+  getDatesValidator,
 } = require("../validators/reports");
 const isAuthenticated = require("../middlewares/isAuthenticated");
 const isAuthorized = require("../middlewares/isAuthorized");
@@ -22,7 +22,7 @@ router.get(
 
 router.get(
   "/unpaid",
-  [getUnpaidValidator, isAuthenticated, isAuthorized(["reader", "admin"])],
+  [getDatesValidator, isAuthenticated, isAuthorized(["reader", "admin"])],
   reportController.getUnpaid
 );
 
@@ -32,6 +32,10 @@ router.get(
   reportController.getSummary
 );
 
-
+router.get(
+  "/delinquent-users",
+  [getDatesValidator, isAuthenticated, isAuthorized(["reader", "admin"])],
+  reportController.getDelinquentUsersReport
+);
 
 module.exports = router;
