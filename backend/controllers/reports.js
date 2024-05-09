@@ -248,7 +248,6 @@ const getDelinquentUsersReport = async (req, res) => {
     });
 
     // Combine and reduce the data
-    // const combinedInvoices = [...unpaidInvoices, ...reconnectionInvoices];
     const combinedInvoices = [
       ...unpaidInvoices.map((invoice) => ({
         ...invoice.toJSON(),
@@ -263,8 +262,9 @@ const getDelinquentUsersReport = async (req, res) => {
 
     const userDebts = combinedInvoices.reduce((acc, invoice) => {
       const userId = invoice.user._id.toString();
-      const month = invoice.invoiceDate.getMonth() + 1; // Month as string
-      const monthKey = `${month}`;
+      const dateFormatted =
+        `${invoice.invoiceDate.getMonth() + 1}`.padStart(2, "0") +
+        `/${invoice.invoiceDate.getFullYear()}`;
       if (!acc[userId]) {
         acc[userId] = {
           name: `${invoice.user.name} ${invoice.user.lastName}`,
@@ -272,9 +272,9 @@ const getDelinquentUsersReport = async (req, res) => {
         };
       }
 
-      // Add each invoice as a separate entry under amounts
+      // Add each invoice with the new date format
       acc[userId].amounts.push({
-        month: monthKey,
+        date: dateFormatted,
         amount: invoice.totalAmount,
         invoiceType: invoice.invoiceType,
       });
@@ -284,7 +284,7 @@ const getDelinquentUsersReport = async (req, res) => {
 
     const result = Object.values(userDebts).map((user) => ({
       ...user,
-      amounts: user.amounts.sort((a, b) => a.month - b.month), // Sort by month for better readability
+      amounts: user.amounts.sort((a, b) => new Date(a.date) - new Date(b.date)), // Sort by date for better readability
     }));
 
     res.status(200).json({

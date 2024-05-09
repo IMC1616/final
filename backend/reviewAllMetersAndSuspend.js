@@ -78,6 +78,6 @@ cron.schedule("0 0 10 * *", () => {
 });
 
 // ejecuta el cron-job inmediatamente al iniciar el servidor
-reviewAllMetersAndSuspend();
+// reviewAllMetersAndSuspend();
 
 module.exports = { reviewAllMetersAndSuspend };

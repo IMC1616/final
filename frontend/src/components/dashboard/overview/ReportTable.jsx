@@ -82,8 +82,6 @@ const ReportTable = () => {
     headers: columns.map((c) => c.header),
   });
 
-  console.log("csvConfig:", csvConfig);
-
   const handleExportRows = (rows) => {
     const csv = generateCsv(csvConfig)(rows.map((row) => row.original));
     download(csvConfig)(csv);

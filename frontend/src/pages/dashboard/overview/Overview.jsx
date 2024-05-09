@@ -5,8 +5,6 @@ import { Box, Container, Grid, Typography } from "@mui/material";
 import { selectSettings } from "../../../features/settings/settingsSlice";
 import { selectCurrentUser } from "../../../features/auth/authSlice";
 import OverviewDebts from "../../../components/dashboard/overview/OverviewDebts";
-import { PersonalStats } from "../../../components/dashboard/overview/PersonalStats";
-import { useGetUserDebtsQuery } from "../../../services/endpoints/users";
 
 const Overview = () => {
   const settings = useSelector(selectSettings);

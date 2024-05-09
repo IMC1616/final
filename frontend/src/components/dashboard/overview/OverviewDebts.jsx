@@ -8,6 +8,7 @@ import { DebtChart } from "./DebtChart";
 // import { IncomesChart } from "./IncomesChart";
 import Guard from "../../Guards/Guard";
 import ReportTable from "./ReportTable";
+import DelinquentUsersReport from "./ReportDelinquentUsersTable";
 
 const OverviewDebts = () => {
   const user = useSelector(selectCurrentUser);
@@ -46,6 +47,9 @@ const OverviewDebts = () => {
       </Guard>
 
       <Guard roles={["admin", "reader"]}>
+        <Grid item xs={12}>
+          <DelinquentUsersReport />
+        </Grid>
         <Grid item xs={12}>
           <ReportTable />
         </Grid>

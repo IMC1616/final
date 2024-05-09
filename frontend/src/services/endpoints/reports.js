@@ -27,6 +27,13 @@ const reportsEndpoint = apiSlice.injectEndpoints({
       }),
       providesTags: [{ type: "Report", id: "Summary" }],
     }),
+    getDelinquentUsersReport: build.query({
+      query: ({ startDate, endDate }) => ({
+        url: `/reports/delinquent-users?startDate=${startDate}&endDate=${endDate}`,
+        method: "GET",
+      }),
+      providesTags: [{ type: "Report", id: "Delinquent" }],
+    }),
   }),
 });
 
@@ -35,4 +42,5 @@ export const {
   useGetUnpaidQuery,
   useGetIncomesQuery,
   useGetSummaryQuery,
+  useGetDelinquentUsersReportQuery,
 } = reportsEndpoint;

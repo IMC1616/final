@@ -164,7 +164,7 @@ const payInvoice = async (req, res) => {
       });
     }
 
-    const invoice = await Model.findById(id);
+    const invoice = await Model.findById(id).populate("meter");
     if (!invoice) {
       return res.status(404).json({
         message: "No se encontró la factura con el ID proporcionado",
@@ -177,12 +177,41 @@ const payInvoice = async (req, res) => {
       });
     }
 
+    if (invoiceType === "regular") {
+      // Check for outstanding ReconnectionInvoice before allowing payment
+      const reconnectionStatus = await ReconnectionInvoice.findOne({
+        meter: invoice.meter._id,
+        paymentStatus: "pending",
+      });
+
+      if (reconnectionStatus) {
+        return res.status(400).json({
+          message:
+            "Existe una factura de reconexión pendiente. Debe pagarla antes de pagar facturas regulares.",
+        });
+      }
+    }
+
     // Update payment status and date
     invoice.paymentStatus = "paid";
     invoice.paymentDate = new Date();
     invoice.registeredBy = req.user._id; // Assuming the user's ID is attached to the request
 
     await invoice.save();
+
+    // Contar facturas pendientes asociadas al medidor
+    const pendingCount = await Model.countDocuments({
+      meter: invoice.meter._id,
+      paymentStatus: "pending",
+    });
+
+    if (pendingCount < 3) {
+      // Cambiar estado del medidor a 'active'
+      await Meter.updateOne(
+        { _id: invoice.meter._id },
+        { $set: { status: "active" } }
+      );
+    }
 
     res.status(200).json({
       success: true,
