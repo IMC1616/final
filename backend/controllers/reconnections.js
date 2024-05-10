@@ -33,7 +33,6 @@ const getReconnections = async (req, res) => {
     }
 
     const reconnections = await queryBuilder.exec();
-    console.log("🚀 ~ getReconnections ~ reconnections:", reconnections);
 
     const totalRecords = await Reconnection.countDocuments(query);
     const totalPages = Math.ceil(totalRecords / limit);

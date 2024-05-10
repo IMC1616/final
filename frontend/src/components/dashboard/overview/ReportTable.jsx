@@ -139,6 +139,7 @@ const ReportTable = () => {
                     onChange={setStartDate}
                     slotProps={{
                       textField: {
+                        size: "small",
                         fullWidth: true,
                         required: true,
                         variant: "outlined",
@@ -153,6 +154,7 @@ const ReportTable = () => {
                     onChange={setEndDate}
                     slotProps={{
                       textField: {
+                        size: "small",
                         fullWidth: true,
                         required: true,
                         variant: "outlined",

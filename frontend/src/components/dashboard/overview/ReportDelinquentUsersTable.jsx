@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import {
   Box,
@@ -7,75 +7,133 @@ import {
   CardContent,
   Button,
   Typography,
+  Dialog,
+  SvgIcon,
 } from "@mui/material";
-import { startOfMonth, endOfMonth } from "date-fns";
+import { startOfMonth, endOfMonth, subMonths } from "date-fns";
 import { useGetDelinquentUsersReportQuery } from "../../../services/endpoints/reports";
 import { MaterialReactTable } from "material-react-table";
 import { MRT_Localization_ES } from "material-react-table/locales/es";
+import ArrowLeftIcon from "../../../icons/ArrowLeft";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf";
+import { mkConfig, generateCsv, download } from "export-to-csv";
+import TablePDF from "./TablePDF";
+import ReactPDF, { PDFViewer } from "@react-pdf/renderer";
 
 const DelinquentUsersReport = () => {
-  const [startDate, setStartDate] = useState(startOfMonth(new Date()));
+  const [startDate, setStartDate] = useState(
+    startOfMonth(subMonths(new Date(), 3))
+  );
   const [endDate, setEndDate] = useState(endOfMonth(new Date()));
+  const [tableData, setTableData] = useState([]);
+  const [openPdfViewer, setOpenPdfViewer] = useState(false);
+  const [pdfDocument, setPdfDocument] = useState(null);
 
-  const {
-    data: { data },
-    error,
-    isLoading,
-  } = useGetDelinquentUsersReportQuery({
+  const { data, error, isLoading } = useGetDelinquentUsersReportQuery({
     startDate: startDate.toISOString().split("T")[0],
     endDate: endDate.toISOString().split("T")[0],
   });
 
+  // Process and set table data whenever the data changes
+  useEffect(() => {
+    if (data && data.data) {
+      const processedData = data.data.map((user) => {
+        const userData = { name: user.name };
+        user.amounts.forEach((amount) => {
+          if (amount.invoiceType === "Reconnection") {
+            const key = `${amount.invoiceType}`;
+            userData[key] = amount.amount; // Assuming each date+type is unique per user
+          } else {
+            userData[amount.date] = amount.amount;
+          }
+        });
+        return userData;
+      });
+      setTableData(processedData);
+    }
+  }, [data]); // Only re-run when data changes
+
+  const columns = useMemo(() => {
+    const months = new Set();
+    const reconnections = new Set();
+
+    tableData.forEach((user) => {
+      Object.keys(user).forEach((key) => {
+        if (key.includes("Reconnection")) {
+          reconnections.add(key);
+        } else if (key !== "name") {
+          months.add(key.split(" ")[0]); // Remove any suffix to just get the date
+        }
+      });
+    });
+
+    return [
+      { accessorKey: "name", header: "Nombre del Usuario" },
+      ...Array.from(months)
+        .sort()
+        .map((month) => ({
+          accessorKey: month,
+          header: month,
+        })),
+      ...Array.from(reconnections)
+        .sort()
+        .map((recon) => ({
+          accessorKey: recon,
+          header: recon,
+        })),
+    ];
+  }, [tableData]);
+
+  console.log("Columns:", columns);
+  console.log("Table Data:", tableData);
+
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
-  // const columns = useMemo(() => {
-  //   // Extract all unique dates from all users
-  //   const uniqueDates = new Set();
-  //   data.forEach((user) => {
-  //     user.amounts.forEach((amount) => {
-  //       uniqueDates.add(amount.date);
-  //     });
-  //   });
+  const csvConfig = mkConfig({
+    fieldSeparator: ",",
+    quoteStrings: '"',
+    decimalSeparator: ".",
+    showLabels: true,
+    useBom: true,
+    useKeysAsHeaders: true,
+    headers: columns.map((c) => c.header),
+  });
 
-  //   // Create column configurations for each unique date
-  //   const dynamicColumns = Array.from(uniqueDates)
-  //     .sort()
-  //     .map((date) => ({
-  //       accessorKey: date,
-  //       header: date,
-  //       Cell: ({ row }) => {
-  //         // Find the amount object for this date, if it exists
-  //         const amountObj = row.original.amounts.find((am) => am.date === date);
-  //         return amountObj
-  //           ? `${amountObj.amount} (${amountObj.invoiceType})`
-  //           : "-";
-  //       },
-  //     }));
+  const handleExportRows = async () => {
+    if (!data || !data.data) return;
 
-  //   // Include the userName column and all dynamically generated date columns
-  //   return [
-  //     { accessorKey: "name", header: "Nombre del Usuario" },
-  //     ...dynamicColumns,
-  //   ];
-  // }, [data]); // Ensure useMemo re-computes when data changes
+    const dataForPdf = data.data.map((user) => ({
+      name: user.name,
+      ...Object.fromEntries(
+        user.amounts.map((amount) => [
+          amount.date,
+          `${amount.amount} (${amount.invoiceType})`,
+        ])
+      ),
+    }));
 
-  // console.log(columns);
+    const pdfBlob = await ReactPDF.pdf(
+      <TablePDF
+        title="Reporte de socios con mora"
+        columns={columns}
+        data={dataForPdf}
+      />
+    ).toBlob();
 
-  // const csvConfig = mkConfig({
-  //   fieldSeparator: ",",
-  //   quoteStrings: '"',
-  //   decimalSeparator: ".",
-  //   showLabels: true,
-  //   useBom: true,
-  //   useKeysAsHeaders: true,
-  //   headers: columns.map((c) => c.header),
-  // });
+    const pdfUrl = URL.createObjectURL(pdfBlob);
+    setPdfDocument(pdfUrl);
+    setOpenPdfViewer(true);
+  };
 
-  const handleExportRows = (rows) => {
-    const csv = generateCsv(csvConfig)(rows.map((row) => row.original));
-    download(csvConfig)(csv);
+  const downloadPDF = () => {
+    const link = document.createElement("a");
+    link.href = pdfDocument;
+    link.setAttribute("download", "reporte-de-socios-con-mora.pdf");
+    document.body.appendChild(link);
+    link.click();
+    link.parentNode.removeChild(link);
   };
 
   return (
@@ -86,31 +144,9 @@ const DelinquentUsersReport = () => {
         </Typography>
 
         <MaterialReactTable
-          columns={[
-            { accessorKey: "date", header: "Fecha" },
-            { accessorKey: "userName", header: "Nombre del Usuario" },
-          ]}
-          data={[]}
-          // manualPagination
-          // manualSorting
-          // manualFiltering
-          // enableGlobalFilter={false}
+          columns={columns}
+          data={tableData}
           localization={MRT_Localization_ES}
-          initialState={{
-            columnVisibility: {},
-            showGlobalFilter: false,
-            showColumnFilters: true,
-            showColumnVisibility: true,
-            showRowStripes: true,
-            showSearchField: false,
-          }}
-          // state={{
-          //   pagination,
-          //   sorting,
-          //   columnFilters,
-          //   showAlertBanner: isError,
-          //   showProgressBars: isFetching || isLoading,
-          // }}
           renderTopToolbarCustomActions={({ table }) => (
             <Box
               sx={{
@@ -128,6 +164,7 @@ const DelinquentUsersReport = () => {
                     onChange={setStartDate}
                     slotProps={{
                       textField: {
+                        size: "small",
                         fullWidth: true,
                         required: true,
                         variant: "outlined",
@@ -142,6 +179,7 @@ const DelinquentUsersReport = () => {
                     onChange={setEndDate}
                     slotProps={{
                       textField: {
+                        size: "small",
                         fullWidth: true,
                         required: true,
                         variant: "outlined",
@@ -158,12 +196,81 @@ const DelinquentUsersReport = () => {
                   >
                     Exportar
                   </Button>
+
+                  {/* <Button
+                    onClick={downloadPDF}
+                    color="secondary"
+                    variant="contained"
+                    startIcon={<PictureAsPdfIcon />}
+                  >
+                    Exportar a PDF
+                  </Button> */}
+
+                  <Button
+                    onClick={handleExportRows}
+                    color="primary"
+                    startIcon={<PictureAsPdfIcon />}
+                  >
+                    Preview PDF
+                  </Button>
+                  {pdfDocument && (
+                    <Button
+                      onClick={downloadPDF}
+                      color="secondary"
+                      startIcon={<FileDownloadIcon />}
+                    >
+                      Download PDF
+                    </Button>
+                  )}
                 </Grid>
               </Grid>
             </Box>
           )}
         />
       </CardContent>
+
+      <Dialog
+        fullScreen
+        open={openPdfViewer}
+        onClose={() => setOpenPdfViewer(false)}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+          }}
+        >
+          <Box
+            sx={{
+              backgroundColor: "background.paper",
+              p: 2,
+            }}
+          >
+            <Button
+              color="inherit"
+              startIcon={
+                <SvgIcon>
+                  <ArrowLeftIcon />
+                </SvgIcon>
+              }
+              onClick={() => setOpenPdfViewer(false)}
+            >
+              Cerrar
+            </Button>
+          </Box>
+
+          <Box sx={{ flexGrow: 1 }}>
+            <PDFViewer style={{ width: "100%", height: "100%" }}>
+              <TablePDF
+                title="Reporte de socios con mora"
+                columns={columns}
+                data={tableData}
+              />
+            </PDFViewer>
+          </Box>
+        </Box>
+      </Dialog>
     </Card>
   );
 };
