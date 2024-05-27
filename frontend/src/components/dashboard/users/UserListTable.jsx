@@ -33,7 +33,7 @@ const UserListTable = () => {
       sorting.map((s) => `${s.desc ? "-" : ""}${s.id}`).join(",") || "asc";
     const offset = pagination.pageIndex * pagination.pageSize;
     const limit = pagination.pageSize;
-    const select = "name,lastName,email,phone,role";
+    const select = "name,lastName,email,ci,phone,role";
     const filters = columnFilters
       .map((filter) => `${filter.id}=${filter.value}`)
       .join("&");
@@ -93,7 +93,10 @@ const UserListTable = () => {
         accessorKey: "role",
         header: "Role",
         filterVariant: "multi-select",
-        filterSelectOptions: roles.map((role) => role.value),
+        filterSelectOptions: roles.map((role) => ({
+          text: role.label,
+          value: role.value,
+        })),
         Cell: ({ renderedCellValue }) => {
           const roleObj = roles.find(
             (role) => role.value === renderedCellValue

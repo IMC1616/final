@@ -1,6 +1,86 @@
 const Invoice = require("../models/Invoice");
 const ReconnectionInvoice = require("../models/ReconnectionInvoice");
 
+// const getReport = async (req, res) => {
+//   try {
+//     const {
+//       startDate,
+//       endDate,
+//       offset = 0,
+//       limit = 10,
+//       sort = "invoiceDate",
+//       select = "",
+//     } = req.query;
+
+//     if (!startDate || !endDate) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Se requieren las fechas de inicio y fin",
+//       });
+//     }
+
+//     const query = {
+//       invoiceDate: {
+//         $gte: new Date(startDate),
+//         $lte: new Date(endDate),
+//       },
+//       paymentStatus: "paid",
+//     };
+
+//     const queryBuilder = Invoice.find(query)
+//       .skip(parseInt(offset))
+//       .limit(parseInt(limit))
+//       .sort(sort)
+//       .populate({
+//         path: "user",
+//         select: "name lastName",
+//       })
+//       .populate({
+//         path: "consumption",
+//         populate: {
+//           path: "meter",
+//           select: "code",
+//         },
+//       });
+
+//     if (select) {
+//       const fields = select.split(",").join(" ");
+//       queryBuilder.select(fields);
+//     }
+
+//     const paidInvoices = await queryBuilder.exec();
+//     const totalRecords = await Invoice.countDocuments(query);
+//     const totalPages = Math.ceil(totalRecords / parseInt(limit));
+
+//     const report = paidInvoices.map((invoice) => ({
+//       invoiceId: invoice._id,
+//       meterCode: invoice.consumption ? invoice.consumption.meter.code : null,
+//       date: invoice.invoiceDate,
+//       userName: `${invoice.user.name} ${invoice.user.lastName}`,
+//       amount: invoice.totalAmount,
+//     }));
+
+//     res.status(200).json({
+//       success: true,
+//       data: {
+//         reports: report,
+//         offset: parseInt(offset),
+//         limit: parseInt(limit),
+//         sort,
+//         select,
+//         totalPages,
+//         totalRecords,
+//       },
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({
+//       success: false,
+//       message: "Hubo un error al obtener el reporte",
+//     });
+//   }
+// };
+
 const getReport = async (req, res) => {
   try {
     const {
@@ -27,7 +107,8 @@ const getReport = async (req, res) => {
       paymentStatus: "paid",
     };
 
-    const queryBuilder = Invoice.find(query)
+    // Consultar facturas pagadas
+    const invoiceQueryBuilder = Invoice.find(query)
       .skip(parseInt(offset))
       .limit(parseInt(limit))
       .sort(sort)
@@ -45,25 +126,67 @@ const getReport = async (req, res) => {
 
     if (select) {
       const fields = select.split(",").join(" ");
-      queryBuilder.select(fields);
+      invoiceQueryBuilder.select(fields);
     }
 
-    const paidInvoices = await queryBuilder.exec();
-    const totalRecords = await Invoice.countDocuments(query);
-    const totalPages = Math.ceil(totalRecords / parseInt(limit));
+    const paidInvoices = await invoiceQueryBuilder.exec();
 
-    const report = paidInvoices.map((invoice) => ({
-      invoiceId: invoice._id,
-      meterCode: invoice.consumption ? invoice.consumption.meter.code : null,
-      date: invoice.invoiceDate,
-      userName: `${invoice.user.name} ${invoice.user.lastName}`,
-      amount: invoice.totalAmount,
-    }));
+    // Consultar facturas de reconexión pagadas
+    const reconnectionInvoiceQueryBuilder = ReconnectionInvoice.find(query)
+      .skip(parseInt(offset))
+      .limit(parseInt(limit))
+      .sort(sort)
+      .populate({
+        path: "meter",
+        populate: [
+          {
+            path: "property",
+            populate: {
+              path: "user",
+              select: "name lastName",
+            },
+          },
+          {
+            path: "category", // Assuming 'category' is directly under 'meter' and doesn't need further nesting
+          },
+        ],
+      });
+
+    if (select) {
+      const fields = select.split(",").join(" ");
+      reconnectionInvoiceQueryBuilder.select(fields);
+    }
+
+    const paidReconnectionInvoices =
+      await reconnectionInvoiceQueryBuilder.exec();
+
+    // Combinar y procesar datos
+    const combinedInvoices = [
+      ...paidInvoices.map((invoice) => ({
+        invoiceId: invoice._id,
+        meterCode: invoice.consumption ? invoice.consumption.meter.code : null,
+        date: invoice.invoiceDate,
+        userName: `${invoice.user.name} ${invoice.user.lastName}`,
+        amount: invoice.totalAmount,
+        invoiceType: "Regular",
+      })),
+      ...paidReconnectionInvoices.map((invoice) => ({
+        invoiceId: invoice._id,
+        meterCode: invoice.meter.code,
+        date: invoice.invoiceDate,
+        userName: `${invoice.meter.property.user.name} ${invoice.meter.property.user.lastName}`,
+        amount: invoice.totalAmount,
+        invoiceType: "Reconnection",
+      })),
+    ];
+
+    const totalRecords = combinedInvoices.length;
+    const totalPages = Math.ceil(totalRecords / parseInt(limit));
 
     res.status(200).json({
       success: true,
       data: {
-        reports: report,
+        reports: combinedInvoices,
         offset: parseInt(offset),
         limit: parseInt(limit),
         sort,
@@ -208,6 +331,98 @@ const getSummary = async (req, res) => {
   }
 };
 
+// const getDelinquentUsersReport = async (req, res) => {
+//   try {
+//     const { startDate, endDate } = req.query;
+
+//     if (!startDate || !endDate) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Start and end dates are required",
+//       });
+//     }
+
+//     // Find all unpaid invoices within the given date range
+//     const unpaidInvoices = await Invoice.find({
+//       invoiceDate: { $gte: new Date(startDate), $lt: new Date(endDate) },
+//       paymentStatus: "pending",
+//     }).populate({
+//       path: "user",
+//       select: "name lastName",
+//     });
+
+//     // Find any related unpaid reconnection invoices
+//     const reconnectionInvoices = await ReconnectionInvoice.find({
+//       invoiceDate: { $gte: new Date(startDate), $lt: new Date(endDate) },
+//       paymentStatus: "pending",
+//     }).populate({
+//       path: "meter",
+//       populate: [
+//         {
+//           path: "property",
+//           populate: {
+//             path: "user",
+//           },
+//         },
+//         {
+//           path: "category", // Assuming 'category' is directly under 'meter' and doesn't need further nesting
+//         },
+//       ],
+//     });
+
+//     // Combine and reduce the data
+//     const combinedInvoices = [
+//       ...unpaidInvoices.map((invoice) => ({
+//         ...invoice.toJSON(),
+//         invoiceType: "Regular",
+//       })),
+//       ...reconnectionInvoices.map((invoice) => ({
+//         ...invoice.toJSON(),
+//         user: invoice.meter.property.user, // Flatten the structure
+//         invoiceType: "Reconnection",
+//       })),
+//     ];
+
+//     const userDebts = combinedInvoices.reduce((acc, invoice) => {
+//       const userId = invoice.user._id.toString();
+//       const dateFormatted =
+//         `${invoice.invoiceDate.getMonth() + 1}`.padStart(2, "0") +
+//         `/${invoice.invoiceDate.getFullYear()}`;
+//       if (!acc[userId]) {
+//         acc[userId] = {
+//           name: `${invoice.user.name} ${invoice.user.lastName}`,
+//           amounts: [],
+//         };
+//       }
+
+//       // Add each invoice with the new date format
+//       acc[userId].amounts.push({
+//         date: dateFormatted,
+//         amount: invoice.totalAmount,
+//         invoiceType: invoice.invoiceType,
+//       });
+
+//       return acc;
+//     }, {});
+
+//     const result = Object.values(userDebts).map((user) => ({
+//       ...user,
+//       amounts: user.amounts.sort((a, b) => new Date(a.date) - new Date(b.date)), // Sort by date for better readability
+//     }));
+
+//     res.status(200).json({
+//       success: true,
+//       data: result,
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({
+//       success: false,
+//       message: "An error occurred while obtaining the report",
+//     });
+//   }
+// };
+
 const getDelinquentUsersReport = async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
@@ -227,6 +442,14 @@ const getDelinquentUsersReport = async (req, res) => {
       path: "user",
       select: "name lastName",
     });
+
+    // Check if there are less than 3 unpaid invoices
+    if (unpaidInvoices.length < 3) {
+      return res.status(200).json({
+        success: true,
+        message: "Not enough unpaid invoices to generate the report",
+      });
+    }
 
     // Find any related unpaid reconnection invoices
     const reconnectionInvoices = await ReconnectionInvoice.find({
@@ -248,7 +471,6 @@ const getDelinquentUsersReport = async (req, res) => {
     });
 
     // Combine and reduce the data
-    // const combinedInvoices = [...unpaidInvoices, ...reconnectionInvoices];
     const combinedInvoices = [
       ...unpaidInvoices.map((invoice) => ({
         ...invoice.toJSON(),
@@ -263,8 +485,9 @@ const getDelinquentUsersReport = async (req, res) => {
 
     const userDebts = combinedInvoices.reduce((acc, invoice) => {
       const userId = invoice.user._id.toString();
-      const month = invoice.invoiceDate.getMonth() + 1; // Month as string
-      const monthKey = `${month}`;
+      const dateFormatted =
+        `${invoice.invoiceDate.getMonth() + 1}`.padStart(2, "0") +
+        `/${invoice.invoiceDate.getFullYear()}`;
       if (!acc[userId]) {
         acc[userId] = {
           name: `${invoice.user.name} ${invoice.user.lastName}`,
@@ -272,9 +495,9 @@ const getDelinquentUsersReport = async (req, res) => {
         };
       }
 
-      // Add each invoice as a separate entry under amounts
+      // Add each invoice with the new date format
       acc[userId].amounts.push({
-        month: monthKey,
+        date: dateFormatted,
         amount: invoice.totalAmount,
         invoiceType: invoice.invoiceType,
       });
@@ -284,7 +507,7 @@ const getDelinquentUsersReport = async (req, res) => {
 
     const result = Object.values(userDebts).map((user) => ({
       ...user,
-      amounts: user.amounts.sort((a, b) => a.month - b.month), // Sort by month for better readability
+      amounts: user.amounts.sort((a, b) => new Date(a.date) - new Date(b.date)), // Sort by date for better readability
     }));
 
     res.status(200).json({

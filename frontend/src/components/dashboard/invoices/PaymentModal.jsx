@@ -24,7 +24,6 @@ const PaymentModal = ({ isOpen, handleClose }) => {
   const handlePayment = async () => {
     try {
       const invoiceType = invoice.invoiceType.toLowerCase();
-      console.log("🚀 ~ handlePayment ~ invoiceType:", invoiceType);
 
       const resultAction = await payInvoice({
         invoiceId: invoice._id,

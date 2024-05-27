@@ -12,13 +12,13 @@ import {
 } from "@mui/material";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import { mkConfig, generateCsv, download } from "export-to-csv";
-import { startOfMonth, endOfMonth } from "date-fns";
+import { startOfMonth, endOfMonth, subMonths } from "date-fns";
 import { useGetReportQuery } from "../../../services/endpoints/reports";
 
 const getCurrentMonthRange = () => {
   const now = new Date();
   return {
-    start: startOfMonth(now),
+    start: startOfMonth(subMonths(new Date(), 3)),
     end: endOfMonth(now),
   };
 };
@@ -82,8 +82,6 @@ const ReportTable = () => {
     headers: columns.map((c) => c.header),
   });
 
-  console.log("csvConfig:", csvConfig);
-
   const handleExportRows = (rows) => {
     const csv = generateCsv(csvConfig)(rows.map((row) => row.original));
     download(csvConfig)(csv);
@@ -141,6 +139,7 @@ const ReportTable = () => {
                     onChange={setStartDate}
                     slotProps={{
                       textField: {
+                        size: "small",
                         fullWidth: true,
                         required: true,
                         variant: "outlined",
@@ -155,6 +154,7 @@ const ReportTable = () => {
                     onChange={setEndDate}
                     slotProps={{
                       textField: {
+                        size: "small",
                         fullWidth: true,
                         required: true,
                         variant: "outlined",

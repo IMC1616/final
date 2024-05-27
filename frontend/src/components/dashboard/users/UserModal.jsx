@@ -24,6 +24,7 @@ import { roles } from "../../../constants";
 
 const UserModal = ({ isOpen, handleClose }) => {
   const data = useSelector(selectModalData);
+  console.log("🚀 ~ UserModal ~ data:", data);
 
   const [createUser] = useCreateUserMutation();
   const [updateUser] = useUpdateUserMutation();

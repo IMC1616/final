@@ -20,7 +20,6 @@ import { statusMap } from "../../../constants";
 const InvoicePreview = ({ invoice, ...other }) => {
   const { user, meter, consumption, totalAmount, paymentStatus, invoiceType } =
     invoice;
-  console.log("🚀 ~ InvoicePreview ~ consumption:", consumption);
 
   const monthName = format(parseISO(invoice.invoiceDate), "MMMM", {
     locale: es,

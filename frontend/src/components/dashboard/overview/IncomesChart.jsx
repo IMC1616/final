@@ -55,6 +55,7 @@ export const IncomesChart = () => {
               onChange={setStartDate}
               slotProps={{
                 textField: {
+                  size: "small",
                   fullWidth: true,
                   required: true,
                   name: "readingDate",
@@ -70,6 +71,7 @@ export const IncomesChart = () => {
               onChange={setEndDate}
               slotProps={{
                 textField: {
+                  size: "small",
                   fullWidth: true,
                   required: true,
                   name: "readingDate",

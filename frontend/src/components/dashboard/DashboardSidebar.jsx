@@ -19,6 +19,7 @@ const roles = {
   admin: "Administrador",
   reader: "Lector",
   customer: "Socio",
+  manifold: "Cobrador",
 };
 
 const DashboardSidebar = (props) => {
@@ -45,6 +46,7 @@ const DashboardSidebar = (props) => {
           title: "Visión general",
           path: "/dashboard",
           icon: <ChartSquareBarIcon fontSize="small" />,
+          roles: ["customer", "reader", "manifold", "admin"],
         },
         // {
         //   title: "Cuenta",
@@ -52,7 +54,6 @@ const DashboardSidebar = (props) => {
         //   icon: <UserIcon fontSize="small" />,
         // },
       ],
-      roles: ["customer", "reader", "manifold", "admin"],
     },
     {
       title: "Administración",
@@ -88,9 +89,19 @@ const DashboardSidebar = (props) => {
           roles: ["admin"],
         },
       ],
-      roles: ["reader", "manifold", "admin"],
     },
   ];
+
+  const filterSectionsByRole = (sections, userRole) => {
+    return sections
+      .map((section) => ({
+        ...section,
+        items: section.items.filter((item) => item.roles.includes(userRole)),
+      }))
+      .filter((section) => section.items.length > 0);
+  };
+
+  const filteredSections = filterSectionsByRole(sections, user.role);
 
   const content = (
     <Box
@@ -153,20 +164,18 @@ const DashboardSidebar = (props) => {
         </Box>
         <Divider />
         <Box sx={{ p: 2 }}>
-          {sections.map((section, index) => (
-            <Guard roles={section.roles} key={index}>
-              <NavSection
-                key={section.title}
-                pathname={location.pathname}
-                isPathActive={isPathActive}
-                sx={{
-                  "& + &": {
-                    mt: 3,
-                  },
-                }}
-                {...section}
-              />
-            </Guard>
+          {filteredSections.map((section, index) => (
+            <NavSection
+              key={index}
+              pathname={location.pathname}
+              isPathActive={isPathActive}
+              sx={{
+                "& + &": {
+                  mt: 3,
+                },
+              }}
+              {...section}
+            />
           ))}
         </Box>
       </Scrollbar>

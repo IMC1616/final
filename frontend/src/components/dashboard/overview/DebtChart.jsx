@@ -51,6 +51,7 @@ export const DebtChart = () => {
               onChange={setStartDate}
               slotProps={{
                 textField: {
+                  size: "small",
                   fullWidth: true,
                   required: true,
                   name: "readingDate",
@@ -66,6 +67,7 @@ export const DebtChart = () => {
               onChange={setEndDate}
               slotProps={{
                 textField: {
+                  size: "small",
                   fullWidth: true,
                   required: true,
                   name: "readingDate",

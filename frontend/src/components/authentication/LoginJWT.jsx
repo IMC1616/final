@@ -30,7 +30,7 @@ const LoginJWT = (props) => {
           const {
             data: { user, token },
           } = await login(values).unwrap();
-          
+
           dispatch(setCredentials({ user, token }));
 
           if (mounted.current) {
@@ -100,13 +100,6 @@ const LoginJWT = (props) => {
             >
               Iniciar sesión
             </Button>
-          </Box>
-          <Box sx={{ mt: 2 }}>
-            <Alert severity="info">
-              <div>
-                Usa <b>gustavoyampara1616@gmail.com</b> y <b>NdeiPDv</b>
-              </div>
-            </Alert>
           </Box>
         </form>
       )}
