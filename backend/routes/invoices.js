@@ -15,14 +15,18 @@ router.get(
   [
     getInvoicesByMeterValidator,
     isAuthenticated,
-    isAuthorized(["reader", "admin"]),
+    isAuthorized(["reader", "manifold", "admin"]),
   ],
   invoiceController.getInvoicesByMeter
 );
 
 router.get(
   "/:id",
-  [invoiceIdValidator, isAuthenticated, isAuthorized(["reader", "admin"])],
+  [
+    invoiceIdValidator,
+    isAuthenticated,
+    isAuthorized(["reader", "manifold", "admin"]),
+  ],
   invoiceController.getInvoiceById
 );
 
@@ -32,7 +36,7 @@ router.put(
     invoiceIdValidator,
     invoiceTypeValidator,
     isAuthenticated,
-    isAuthorized(["reader", "admin"]),
+    isAuthorized(["reader", "manifold", "admin"]),
   ],
   invoiceController.payInvoice
 );

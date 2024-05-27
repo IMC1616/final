@@ -12,13 +12,13 @@ import {
 } from "@mui/material";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import { mkConfig, generateCsv, download } from "export-to-csv";
-import { startOfMonth, endOfMonth } from "date-fns";
+import { startOfMonth, endOfMonth, subMonths } from "date-fns";
 import { useGetReportQuery } from "../../../services/endpoints/reports";
 
 const getCurrentMonthRange = () => {
   const now = new Date();
   return {
-    start: startOfMonth(now),
+    start: startOfMonth(subMonths(new Date(), 3)),
     end: endOfMonth(now),
   };
 };

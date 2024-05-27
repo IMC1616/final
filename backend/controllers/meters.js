@@ -122,7 +122,7 @@ const getMeterConsumptions = async (req, res) => {
 
 const createMeter = async (req, res) => {
   try {
-    const { code, status, property, category } = matchedData(req);
+    const { code, status, property, category, reconnection } = matchedData(req);
 
     const meterExists = await Meter.findOne({
       code,
@@ -152,6 +152,7 @@ const createMeter = async (req, res) => {
       data: meter,
     });
   } catch (error) {
+    console.log("🚀 ~ createMeter ~ error:", error);
     handleHttpError(res, "ERROR_CREATE_METER");
   }
 };
